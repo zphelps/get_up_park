@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "655836600388",
+    "project_id": "get-up-park",
+    "storage_bucket": "get-up-park.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655836600388:android:ad6da8ec1f3d1502a90411",
+        "android_client_info": {
+          "package_name": "com.zachphelps.get_up_park"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "655836600388-jn1gkf1lvpo4djdf7mt4ir5g5fmq6v22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEMrs702Jwfr3aRTobiAJohWPnAAG-SA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "655836600388-jn1gkf1lvpo4djdf7mt4ir5g5fmq6v22.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "655836600388-epplegqosknrtbqk86p2tv1uauvcek3m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.flutterflow.getuppark"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
