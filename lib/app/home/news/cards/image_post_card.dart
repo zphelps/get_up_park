@@ -21,25 +21,25 @@ class ImagePostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(0), //6
           boxShadow: [
             BoxShadow(
               // color: Colors.black.withOpacity(0.15),
               // spreadRadius: 1,
               // blurRadius: 6,
               // offset: const Offset(0, 2),
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 0,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
+              // color: Colors.black.withOpacity(0.2),
+              // spreadRadius: 0,
+              // blurRadius: 3,
+              // offset: const Offset(0, 1),
             )
           ]
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6), //15, 6
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -53,7 +53,7 @@ class ImagePostCard extends StatelessWidget {
                 );
               },
               dense: true,
-              contentPadding: EdgeInsets.zero,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
               horizontalTitleGap: 8,
               minVerticalPadding: 0,
               visualDensity: const VisualDensity(vertical: -1),
@@ -75,16 +75,17 @@ class ImagePostCard extends StatelessWidget {
               title: Text(
                 article.group,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  color: Colors.black,
                 ),
               ),
               subtitle: Text(
                   DateFormat.yMMMMd('en_US')
                       .format(DateTime.parse(article.date)),
                 style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
                   fontSize: 12,
                   fontFamily: 'SanFrancisco',
                 ),
@@ -169,28 +170,31 @@ class ImagePostCard extends StatelessWidget {
             const SizedBox(height: 2),
             () {
               if(article.body.length > 1) {
-                return Column(
-                  children: [
-                    ExpandableText(
-                      article.body,
-                      expandText: 'show more',
-                      collapseText: 'show less',
-                      maxLines: 3,
-                      expandOnTextTap: true,
-                      linkColor: Colors.grey[600],
-                      linkStyle: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 15,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      ExpandableText(
+                        article.body,
+                        expandText: 'show more',
+                        collapseText: 'show less',
+                        maxLines: 5,
+                        expandOnTextTap: true,
+                        linkColor: Colors.grey[600],
+                        linkStyle: const TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                          // fontFamily: 'SanFrancisco',
+                        ),
                       ),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                        fontFamily: 'SanFrancisco',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                      const SizedBox(height: 12),
+                    ],
+                  ),
                 );
               }
               return const SizedBox(height: 0);
@@ -207,7 +211,7 @@ class ImagePostCard extends StatelessWidget {
               child: Hero(
                 tag: article.imageURL,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(0), //5
                   child: CachedNetworkImage(
                     memCacheHeight: 3000,
                     memCacheWidth: 4000,
@@ -216,36 +220,14 @@ class ImagePostCard extends StatelessWidget {
                     placeholderFadeInDuration: Duration.zero,
                     fadeInDuration: Duration.zero,
                     fit: BoxFit.fitWidth,
-                    width: 374,
+                    // width: 374,
+                    width: MediaQuery.of(context).size.width,
                     // height: 300,
                     placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
                   ),
                 ),
               ),
             ),
-            // FullScreenWidget(
-            //   backgroundColor: Colors.white,
-            //   child: Center(
-            //     child: Hero(
-            //       tag: article.imageURL,
-            //       child: ClipRRect(
-            //         borderRadius: BorderRadius.circular(5),
-            //         child: CachedNetworkImage(
-            //           memCacheHeight: 3000,
-            //           memCacheWidth: 4000,
-            //           imageUrl: article.imageURL,
-            //           fadeOutDuration: Duration.zero,
-            //           placeholderFadeInDuration: Duration.zero,
-            //           fadeInDuration: Duration.zero,
-            //           fit: BoxFit.fitWidth,
-            //           width: 374,
-            //           height: 200,
-            //           placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
             const SizedBox(height: 12),
           ],
         ),

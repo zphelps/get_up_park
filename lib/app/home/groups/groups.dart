@@ -48,7 +48,7 @@ class Groups extends ConsumerWidget {
             leading: const Padding(
               padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
               child: Image(
-                image: AssetImage('assets/pantherHead.png'),
+                image: AssetImage('assets/pantherHeadLowRes.png'),
                 height: 45,
                 width: 45,
               ),
@@ -86,6 +86,9 @@ class Groups extends ConsumerWidget {
                       onTap: () {
                         Navigator.of(context, rootNavigator: true).pushNamed(
                           AppRoutes.settingsView,
+                            arguments: {
+                              'user': user,
+                            }
                         );
                       },
                       child: CircleAvatar(

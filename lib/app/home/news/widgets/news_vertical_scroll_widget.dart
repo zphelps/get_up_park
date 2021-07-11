@@ -124,11 +124,14 @@ class _SortNewsState extends State<SortNews> {
 
     return widget.groupAsyncValue.when(
       data: (groups) {
-        return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 10),
+        return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10), //8
             itemCount: filteredNews.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
+            separatorBuilder: (context, index) {
+              return Divider(height: 0, thickness: 1, color: Colors.grey[300],);
+            },
             itemBuilder: (context, index) {
               for(Group g in groups) {
                 if(g.name == filteredNews[index].group) {

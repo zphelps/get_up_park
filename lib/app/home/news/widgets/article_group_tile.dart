@@ -36,17 +36,20 @@ class ArticleGroupTile extends ConsumerWidget {
       contentPadding: const EdgeInsets.only(right: 5),
       leading: CircleAvatar(
         backgroundColor: Colors.transparent,
-        child: CachedNetworkImage(
-          memCacheHeight: 200,
-          memCacheWidth: 200,
-          imageUrl: groupLogoURL,
-          fadeInDuration: Duration.zero,
-          placeholderFadeInDuration: Duration.zero,
-          fadeOutDuration: Duration.zero,
-          fit: BoxFit.fitHeight,
-          width: 35,
-          height: 35,
-          placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: CachedNetworkImage(
+            memCacheHeight: 200,
+            memCacheWidth: 200,
+            imageUrl: groupLogoURL,
+            fadeInDuration: Duration.zero,
+            placeholderFadeInDuration: Duration.zero,
+            fadeOutDuration: Duration.zero,
+            fit: BoxFit.fitHeight,
+            width: 35,
+            height: 35,
+            placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+          ),
         ),
       ),
       title: Text(

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/events/event_card.dart';
-import 'package:get_up_park/app/home/events/upcoming_events_widget.dart';
+import 'package:get_up_park/app/home/events/upcoming_events_card.dart';
 import 'package:get_up_park/app/home/home/covid_card.dart';
 import 'package:get_up_park/app/home/home/lunch_card.dart';
 import 'package:get_up_park/app/home/home/lunch_widget.dart';
@@ -31,52 +31,69 @@ class Home extends ConsumerWidget {
       data: (user) {
         return Scaffold(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            brightness: Brightness.light,
-            title: const Text(
-              Strings.appName,
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+              brightness: Brightness.light,
+              title: const Text(
+                Strings.appName,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
-            ),
-            toolbarHeight: 65,
-            leadingWidth: 60,
-            centerTitle: false,
-            leading: const Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-              child: Image(
-                image: AssetImage('assets/pantherHead.png'),
-                height: 45,
-                width: 45,
+              toolbarHeight: 65,
+              leadingWidth: 60,
+              centerTitle: false,
+              leading: const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                child: Image(
+                  // fit: BoxFit.fitWidth,
+                  image: AssetImage('assets/pantherHeadLowRes.png'),
+                  height: 45,
+                  width: 45,
+                ),
               ),
-            ),
-            backgroundColor: Colors.white,
-            elevation: 1,
-            actions: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context, rootNavigator: true).pushNamed(
-                      AppRoutes.settingsView,
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.grey[200],
-                    child: const Icon(
-                      Icons.settings,
-                      color: Colors.black,
-                      size: 22,
+              backgroundColor: Colors.white,
+              elevation: 1,
+              forceElevated: true,
+              actions: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context, rootNavigator: true).pushNamed(
+                          AppRoutes.settingsView,
+                          arguments: {
+                            'user': user,
+                          }
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.grey[200],
+                      child: const Icon(
+                        Icons.settings,
+                        color: Colors.black,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate.fixed(
+                    [
+                      _buildContents(context, watch, user),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          body: _buildContents(context, watch, user),
         );
       },
       loading: () {
@@ -103,17 +120,17 @@ class Home extends ConsumerWidget {
           // ),
           // const SizedBox(height: 12),
           LunchPreviewCard(date: DateTime.now().toString(), user: user),
-          const SizedBox(height: 10),
+          const SizedBox(height: 18),
           FeaturedNewsCard(admin: user.admin, category: 'Sports'),
-          const SizedBox(height: 20),
-          const UpcomingEventsWidget(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
+          const UpcomingEventsCard(),
+          const SizedBox(height: 25),
           FeaturedNewsCard(admin: user.admin, category: 'Clubs'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
           FeaturedNewsCard(admin: user.admin, category: 'Administration'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
           FeaturedNewsCard(admin: user.admin, category: 'Student Council'),
-          const SizedBox(height: 100),
+          const SizedBox(height: 50),
         ],
       ),
     );
