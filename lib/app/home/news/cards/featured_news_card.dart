@@ -42,7 +42,7 @@ class FeaturedNewsCard extends ConsumerWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       child: InkWell(
         onTap: () {
           Navigator.of(context, rootNavigator: true).pushNamed(
@@ -67,7 +67,7 @@ class FeaturedNewsCard extends ConsumerWidget {
                 imageUrl: article!.imageURL,
                 fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.width * 0.99,
-                height: 225,
+                height: 260,
                 placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
               ),
             ),
@@ -122,10 +122,10 @@ class FeaturedNewsCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withOpacity(0.175), //0.35
               spreadRadius: 0,
-              blurRadius: 24,
-              offset: const Offset(0, 2),
+              blurRadius: 30,
+              offset: const Offset(0, 4),
             )
           ]
       ),

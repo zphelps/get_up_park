@@ -30,8 +30,11 @@ class ArticleView extends StatelessWidget {
           SliverAppBar(
             stretch: true,
             pinned: true,
+            toolbarHeight: 45,
+            collapsedHeight: 45,
             backgroundColor: Colors.white,
             elevation: 1,
+            brightness: Brightness.light,
             iconTheme: const IconThemeData(
               color: Colors.black,
             ),
@@ -209,7 +212,7 @@ class ArticleView extends StatelessWidget {
                         child: AutoSizeText(
                           article.title,
                           style: const TextStyle(
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                             fontSize: 30,
                             color: Colors.black,
                           ),
@@ -248,11 +251,12 @@ class ArticleView extends StatelessWidget {
                       child: Text(
                         article.body,
                         style: TextStyle(
-                          color: Colors.grey[700],
-                          fontSize: 18,
+                          color: Colors.grey[800],
+                          fontSize: 16,
                           letterSpacing: -0.1,
-                          height: 1.4,
-                          fontWeight: FontWeight.w400,
+                          height: 1.35,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'SanFrancisco',
                         ),
                       ),
                     ),

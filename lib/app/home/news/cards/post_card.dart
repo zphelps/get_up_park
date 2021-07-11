@@ -21,7 +21,7 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), //6, 3
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
@@ -31,10 +31,10 @@ class PostCard extends StatelessWidget {
             // spreadRadius: 1,
             // blurRadius: 6,
             // offset: const Offset(0, 2),
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 0,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+            // color: Colors.black.withOpacity(0.2),
+            // spreadRadius: 0,
+            // blurRadius: 3,
+            // offset: const Offset(0, 1),
           )
         ]
       ),
@@ -75,8 +75,8 @@ class PostCard extends StatelessWidget {
               title: Text(
                 article.group,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
                   color: Colors.black,
                 ),
               ),
@@ -84,8 +84,8 @@ class PostCard extends StatelessWidget {
                 DateFormat.yMMMMd('en_US')
                     .format(DateTime.parse(article.date)),
                 style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
                   fontSize: 12,
                   fontFamily: 'SanFrancisco',
                 ),
@@ -170,13 +170,14 @@ class PostCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
+
             Padding(
               padding: const EdgeInsets.only(left: 2),
               child: ExpandableText(
                 article.body,
                 expandText: 'show more',
                 collapseText: 'show less',
-                maxLines: 3,
+                maxLines: 5,
                 expandOnTextTap: true,
                 linkColor: Colors.grey[600],
                 linkStyle: const TextStyle(
@@ -185,9 +186,9 @@ class PostCard extends StatelessWidget {
                 ),
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: Colors.black,
-                  fontFamily: 'SanFrancisco',
+                  // fontFamily: 'SanFrancisco',
                 ),
               ),
             ),

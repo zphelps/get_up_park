@@ -41,20 +41,29 @@ class EventListWidget extends ConsumerWidget {
     List<Event> allEvents = [];
     eventsAsyncValue.whenData((events) {
       for (Event event in events) {
-        if(past) {
-          if(group != 'all' && event.group == group && DateTime.parse(event.date).isBefore(DateTime.now())) {
-            allEvents.add(event);
-          }
-          else if(group == 'all' && DateTime.parse(event.date).isBefore(DateTime.now())) {
+        if(date != '') {
+          DateTime eventDate = DateTime.parse(event.date);
+          DateTime today = DateTime.now();
+          if(eventDate.month == today.month && eventDate.day == today.day && eventDate.weekday == today.weekday && eventDate.year == today.year) {
             allEvents.add(event);
           }
         }
         else {
-          if(group != 'all' && event.group == group && DateTime.parse(event.date).isAfter(DateTime.now())) {
-            allEvents.add(event);
+          if(past) {
+            if(group != 'all' && event.group == group && DateTime.parse(event.date).isBefore(DateTime.now())) {
+              allEvents.add(event);
+            }
+            else if(group == 'all' && DateTime.parse(event.date).isBefore(DateTime.now())) {
+              allEvents.add(event);
+            }
           }
-          else if(group == 'all' && DateTime.parse(event.date).isAfter(DateTime.now())) {
-            allEvents.add(event);
+          else {
+            if(group != 'all' && event.group == group && DateTime.parse(event.date).isAfter(DateTime.now())) {
+              allEvents.add(event);
+            }
+            else if(group == 'all' && DateTime.parse(event.date).isAfter(DateTime.now())) {
+              allEvents.add(event);
+            }
           }
         }
       }
@@ -106,7 +115,15 @@ class EventListWidget extends ConsumerWidget {
           }
         }
         else {
-          if(allEvents[index].group == group && DateTime.parse(date).day == DateTime.parse(allEvents[index].date).day) {
+          if(group == 'all') {
+            return Column(
+              children: [
+                UpcomingEventTile(event: allEvents[index]),
+                // const Divider(height: 0, thickness: 0.65),
+              ],
+            );
+          }
+          else if(allEvents[index].group == group && DateTime.parse(date).day == DateTime.parse(allEvents[index].date).day) {
             return Column(
               children: [
                 // const Divider(height: 0, thickness: 0.65),

@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
+import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
+import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameScheduleTile extends StatelessWidget {
   const GameScheduleTile({required this.game, required this.admin, required this.group});
@@ -39,7 +42,37 @@ class GameScheduleTile extends StatelessWidget {
               caption: 'Delete',
               color: Colors.red,
               icon: Icons.delete,
-              onTap: () => print('Delete'),
+              onTap: () {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Are you sure?'),
+                    content: const Text('Once deleted, you will not be able to recover this post.'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final database = context.read<FirestoreDatabase>(databaseProvider);
+                          await database.deleteGame(game);
+                          // Navigator.of(context).popUntil((route) => !route.hasActiveRouteBelow);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ];
         }

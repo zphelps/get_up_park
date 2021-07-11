@@ -11,61 +11,36 @@ import 'package:get_up_park/services/auth.dart';
 import 'package:mailto/mailto.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final userStreamProvider =
-StreamProvider.autoDispose<PTUser>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.userStream();
+class Settings extends StatelessWidget {
+  const Settings({required this.user});
 
-});
-class Settings extends ConsumerWidget {
+  final PTUser user;
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final userAsyncValue = watch(userStreamProvider);
-
-    return userAsyncValue.when(
-      data: (user) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            brightness: Brightness.light,
-            iconTheme: const IconThemeData(
-              color: Colors.black
-            ),
-            title: const Text(
-              Strings.settings,
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 17,
-              ),
-            ),
-            // leading: const Padding(
-            //   padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-            //   child: Image(
-            //     image: AssetImage('assets/pantherHead.png'),
-            //     height: 45,
-            //     width: 45,
-            //   ),
-            // ),
-            backgroundColor: Colors.white,
-            elevation: 1,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        brightness: Brightness.light,
+        iconTheme: const IconThemeData(
+            color: Colors.black
+        ),
+        title: const Text(
+          Strings.settings,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
           ),
-          body: _buildContents(context, watch, user),
-        );
-      },
-      loading: () {
-        return Container(
-          color: Colors.transparent,
-        );
-      },
-      error: (_,__) {
-        return EmptyContent();
-      },
+        ),
+        backgroundColor: Colors.white,
+        elevation: 1,
+      ),
+      body: _buildContents(context, user),
     );
   }
 
-  Widget _buildContents(BuildContext context, ScopedReader watch, PTUser user) {
+  Widget _buildContents(BuildContext context, PTUser user) {
     final AuthService _auth = AuthService();
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -145,13 +120,13 @@ class Settings extends ConsumerWidget {
                 HapticFeedback.heavyImpact();
                 String url = 'https://docs.google.com/forms/d/e/1FAIpQLSdTjeqSX49CMrRGVxuc9qChktczzf3w3o_eXm_h_WdNGTcxfw/viewform?usp=sf_link';
                 if (await canLaunch(url)) {
-              await launch(url);
-              }
-              else {
-              // can't launch url, there is some error
-              print('eror');
-              throw "Could not launch $url";
-              }
+                  await launch(url);
+                }
+                else {
+                  // can't launch url, there is some error
+                  print('eror');
+                  throw "Could not launch $url";
+                }
               }
             },
             dense: true,
@@ -222,12 +197,12 @@ class Settings extends ConsumerWidget {
               HapticFeedback.heavyImpact();
               String url = 'https://www.parktudor.org';
               if (await canLaunch(url)) {
-              await launch(url);
+                await launch(url);
               }
               else {
-              // can't launch url, there is some error
-              print('eror');
-              throw "Could not launch $url";
+                // can't launch url, there is some error
+                print('eror');
+                throw "Could not launch $url";
               }
             },
             dense: true,
@@ -321,9 +296,9 @@ class Settings extends ConsumerWidget {
             child: Text(
               'Beta release 0.1.0. Created by Zach Phelps.',
               style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w300
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w300
               ),
             ),
           ),

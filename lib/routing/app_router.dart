@@ -413,8 +413,10 @@ class AppRouter {
           //fullscreenDialog: true,
         );
       case AppRoutes.settingsView:
+        final mapArgs = args as Map<String, dynamic>;
+        final user = mapArgs['user'] as PTUser;
         return CupertinoPageRoute<dynamic>(
-          builder: (_) => Settings(), //pages other than main pages
+          builder: (_) => Settings(user: user), //pages other than main pages
           settings: settings,
           //fullscreenDialog: true,
         );

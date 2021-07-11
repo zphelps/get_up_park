@@ -107,6 +107,8 @@ class FirestoreDatabase {
 
   Future<void> setGame(Game game) => _database.collection('games').doc(game.id).set(game.toMap());
 
+  Future<void> deleteGame(Game game) => _database.collection('games').doc(game.id).delete();
+
   Future<void> setOpponent(Opponent opponent) => _database.collection('opponents').doc(opponent.id).set(opponent.toMap());
 
   Future<void> updateGameScore(String gameID, String opponentScore, String homeScore, String gameDone) => _database.collection('games').doc(gameID).update(

@@ -11,10 +11,22 @@ class LunchPreviewCard extends StatelessWidget {
   final String date;
   final PTUser user;
 
+  String getGreeting() {
+    if(DateTime.now().hour > 0 && DateTime.now().hour < 13) {
+      return 'Good morning,';
+    }
+    else if(DateTime.now().hour > 12 && DateTime.now().hour < 17) {
+      return 'Good afternoon,';
+    }
+    else {
+      return 'Good evening,';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
       child: InkWell(
         onTap: () {
           Navigator.of(context, rootNavigator: true).pushNamed(
@@ -37,7 +49,7 @@ class LunchPreviewCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                'Good morning,',
+                getGreeting(),
                 style: TextStyle(
                   color: Colors.grey[800],
                   fontSize: 16,
@@ -64,12 +76,12 @@ class LunchPreviewCard extends StatelessWidget {
                 "Today is ${DateFormat.MMMMEEEEd().format(DateTime.now())}, and it's a red week! For lunch today, we have:",
                 style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: Colors.black
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             // const SizedBox(height: 5),
             LunchListWidget(date: DateTime.now().toString(), itemCount: 5,),
             const SizedBox(height: 4),
@@ -117,10 +129,10 @@ class LunchPreviewCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.35),
+              color: Colors.black.withOpacity(0.175), //0.35
               spreadRadius: 0,
-              blurRadius: 18,
-              offset: const Offset(0, 2),
+              blurRadius: 30,
+              offset: const Offset(0, 4),
             )
           ]
       ),

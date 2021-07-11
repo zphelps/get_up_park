@@ -31,25 +31,25 @@ class NewsCard extends StatelessWidget {
       },
       child: SizedBox(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(0), //6
               boxShadow: [
                 BoxShadow(
                   // color: Colors.black.withOpacity(0.15),
                   // spreadRadius: 1,
                   // blurRadius: 6,
                   // offset: const Offset(0, 2),
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 0,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
+                  // color: Colors.black.withOpacity(0.2),
+                  // spreadRadius: 0,
+                  // blurRadius: 3,
+                  // offset: const Offset(0, 1),
                 )
               ]
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,12 +90,12 @@ class NewsCard extends StatelessWidget {
                       child: AutoSizeText(
                         article.title,
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                         ),
                         maxLines: 3,
-                        minFontSize: 18,
+                        minFontSize: 17,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -121,8 +121,8 @@ class NewsCard extends StatelessWidget {
                     placeholderFadeInDuration: Duration.zero,
                     fadeInDuration: Duration.zero,
                     fit: BoxFit.cover,
-                    width: 100,
-                    height: 100,
+                    width: 105,
+                    height: 105,
                     placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
                   ),
                 ),
