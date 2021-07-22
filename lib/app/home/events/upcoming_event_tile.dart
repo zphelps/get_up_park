@@ -6,21 +6,33 @@ import 'package:get_up_park/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class UpcomingEventTile extends StatelessWidget {
-  const UpcomingEventTile({required this.event});
+  const UpcomingEventTile({required this.event, required this.admin});
 
   final Event event;
+  final String admin;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         HapticFeedback.lightImpact();
-        Navigator.of(context, rootNavigator: true).pushNamed(
-            AppRoutes.eventView,
-            arguments: {
-              'event': event,
-            }
-        );
+        if(event.gameID != '') {
+          Navigator.of(context, rootNavigator: true).pushNamed(
+              AppRoutes.gameView,
+              arguments: {
+                'admin': admin,
+                'gameID': event.gameID,
+              }
+          );
+        }
+        else {
+          Navigator.of(context, rootNavigator: true).pushNamed(
+              AppRoutes.eventView,
+              arguments: {
+                'event': event,
+              }
+          );
+        }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
@@ -46,21 +58,16 @@ class UpcomingEventTile extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Text(
-                //   '${DateFormat.E('en_US').format(DateTime.parse(event.date))}, ${DateFormat.MMMd('en_US').format(DateTime.parse(event.date))} at ${DateFormat.jm('en_US').format(DateTime.parse(event.date))}',
-                //   style: TextStyle(
-                //     color: Colors.grey[600],
-                //     fontWeight: FontWeight.w500,
-                //     fontSize: 12,
-                //   ),
-                // ),
-                // const SizedBox(height: 1),
-                Text(
-                  event.title,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: Text(
+                    event.title,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(height: 2),

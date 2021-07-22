@@ -1,71 +1,61 @@
 import 'dart:io';
-
 import 'package:alert_dialogs/alert_dialogs.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:get_up_park/app/home/events/event_model.dart';
-import 'package:get_up_park/app/home/groups/group_model.dart';
+import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
-import 'package:get_up_park/app/home/sports/opponent_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_up_park/services/push_notifications.dart';
 import 'package:images_picker/images_picker.dart';
-import 'package:intl/intl.dart';
 
+class PostGameUpdateView extends StatefulWidget {
+  const PostGameUpdateView({required this.game, required this.groupLogoURL});
 
-class CreateOpponentView extends StatefulWidget {
-  const CreateOpponentView();
+  final Game game;
+  final String groupLogoURL;
 
   @override
-  State<CreateOpponentView> createState() => _CreateOpponentViewState();
+  State<PostGameUpdateView> createState() => _PostGameUpdateViewState();
 }
 
-class _CreateOpponentViewState extends State<CreateOpponentView> {
+class _PostGameUpdateViewState extends State<PostGameUpdateView> {
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _group = widget.game.group;
+    _groupLogoURL = widget.groupLogoURL;
+    _gameID = widget.game.id;
+
   }
 
   final _formKey = GlobalKey<FormState>();
 
-  Map? dataFromGroupSelector;
+  final articleCharacterCountMinimum = 300;
 
-  final picker = ImagesPicker;
-
-  Future getImageFromPicker() async {
-    final List<Media>? pickedFile = await ImagesPicker.pick(
-      count: 1,
-      pickType: PickType.image,
-    );
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile[0].path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  String? _opponentName;
-  String? _opponentLogoURL;
-  File? _image;
+  String? _body;
+  String? _group;
+  String? _groupLogoURL;
+  String? _gameID;
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
-    if (form.validate() && _image != null) {
+    if((_body ?? '').length > 0) {
       form.save();
       return true;
     }
-    return false;
+    else {
+      return false;
+    }
   }
 
   bool _loading = false;
+
 
   Future<void> _submit() async {
     if(_validateAndSaveForm()){
@@ -74,15 +64,19 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
           _loading = true;
         });
         final database = context.read<FirestoreDatabase>(databaseProvider);
-        final id = documentIdFromCurrentDate();
-        final _opponentLogoURL = await database.uploadFile(_image!, 'opponentLogos');
-        final opponent = Opponent(
-          id: id,
-          name: _opponentName!,
-          logoURL: _opponentLogoURL,
+        final article = Article(
+            id: documentIdFromCurrentDate(),
+            title: '',
+            body: _body!,
+            imageURL: '',
+            category: 'Sports',
+            group: _group!,
+            groupLogoURL: _groupLogoURL!,
+            date: DateTime.now().toString(),
+            gameID: _gameID ?? '',
+            gameDone: 'false',
         );
-        await database.setOpponent(opponent);
-        // await Future.delayed(const Duration(seconds: 1));
+        await database.setArticle(article);
         Navigator.of(context).pop();
       } catch (e) {
         showExceptionAlertDialog(
@@ -96,11 +90,6 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
 
   @override
   Widget build(BuildContext context) {
-    dataFromGroupSelector =
-    (dataFromGroupSelector == null ? dataFromGroupSelector : ModalRoute
-        .of(context)!
-        .settings
-        .arguments) as Map?;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -110,7 +99,7 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
         ),
         backgroundColor: Colors.white,
         title: const Text(
-          'Create Opponent',
+          'Game Update',
           style: TextStyle(
             color: Colors.black,
             fontSize: 16,
@@ -127,9 +116,16 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
             padding: const EdgeInsets.only(right: 12),
             child: InkWell(
               onTap: _submit,
-              child: const Chip(
-                backgroundColor: Colors.red,//_text != null ? Colors.red : Colors.red[200],
-                label: Text(
+              child: Chip(
+                backgroundColor: () {
+                  if((_body ?? '').length > 0) {
+                    return Colors.red;
+                  }
+                  else {
+                    return Colors.red[200];
+                  }
+                }(),
+                label: const Text(
                   'Create',
                   style:
                   TextStyle(
@@ -163,12 +159,15 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              const Divider(height: 0, thickness: 0.5, color: Colors.grey),
+              // const Divider(height: 0, thickness: 0.5, color: Colors.grey),
               TextFormField(
+                autofocus: true,
+                autocorrect: true,
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                  labelText: 'Opponent name',
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                  alignLabelWithHint: true,
+                  labelText: 'Write game update...',
                   labelStyle: TextStyle(
                     color: Colors.grey,
                   ),
@@ -198,51 +197,20 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
                   ),
                 ),
                 keyboardAppearance: Brightness.light,
+                //maxLines: 8,
+                minLines: 5,
+                maxLines: 30,
+                initialValue: _body,
                 validator: (value) =>
                 (value ?? '').isNotEmpty
                     ? null
-                    : 'Opponent name can\'t be empty',
-                onSaved: (value) => _opponentName = value,
+                    : 'update body can\'t be empty',
+                onChanged: (value) {
+                  setState(() {
+                    _body = value;
+                  });
+                },
               ),
-              const SizedBox(height: 2),
-              Column(
-                children: <Widget>[
-                  Center(
-                      child: _image == null
-                          ? const Image(
-                          image: AssetImage('assets/noImageSelected.png'),
-                          height: 200,
-                          width: 250) //Text('No image selected.')
-                          : Image(image: FileImage(_image!),
-                          height: 200,
-                          width: 250) //Image.file(_image),
-                  ),
-                  const SizedBox(height: 5),
-                  TextButton(
-                    onPressed: getImageFromPicker,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 12),
-                      child: Text(
-                        _image == null ? 'Select image' : 'Change image',
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(
-                height: 0,
-                thickness: 0.5,
-                color: Colors.grey,
-              )
             ],
           ),
         ),

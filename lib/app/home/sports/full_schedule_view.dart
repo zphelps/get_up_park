@@ -30,7 +30,7 @@ class FullScheduleView extends StatelessWidget {
         ),
         actions: [
               () {
-            if(admin == 'true') {
+            if(admin == 'Admin' || admin == 'Student Admin') {
               return IconButton(
                 padding: const EdgeInsets.only(right: 16),
                 onPressed: () {

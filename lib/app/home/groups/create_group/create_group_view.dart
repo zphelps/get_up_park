@@ -141,8 +141,8 @@ class _CreateGroupViewState extends State<CreateGroupView> {
       });
       final database = context.read<FirestoreDatabase>(databaseProvider);
       final _id = documentIdFromCurrentDate();
-      final _backgroundImageURL = await database.uploadFile(_backgroundImage!);
-      final _logoURL = await database.uploadFile(_logoImage!);
+      final _backgroundImageURL = await database.uploadFile(_backgroundImage!, _name ?? 'misc');
+      final _logoURL = await database.uploadFile(_logoImage!, _name ?? 'misc');
       final group = Group(
         id: _id,
         name: _name!,

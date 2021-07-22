@@ -28,11 +28,11 @@ class LunchPreviewCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
       child: InkWell(
-        onTap: () {
-          Navigator.of(context, rootNavigator: true).pushNamed(
-              AppRoutes.groupEventsView,
-          );
-        },
+        // onTap: () {
+        //   Navigator.of(context, rootNavigator: true).pushNamed(
+        //       AppRoutes.groupEventsView,
+        //   );
+        // },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -21,12 +21,13 @@ final eventsStreamProvider = StreamProvider.autoDispose<List<Event>>((ref) {
 // watch database
 class EventListWidget extends ConsumerWidget {
 
-  EventListWidget({this.group = 'all', this.past = false, this.date = '', this.itemCount = 0});
+  EventListWidget({this.group = 'all', this.past = false, this.date = '', this.itemCount = 0, required this.admin});
 
   final String group;
   final bool past;
   final int itemCount;
   final String date;
+  final String admin;
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
@@ -50,18 +51,18 @@ class EventListWidget extends ConsumerWidget {
         }
         else {
           if(past) {
-            if(group != 'all' && event.group == group && DateTime.parse(event.date).isBefore(DateTime.now())) {
+            if(group != 'all' && event.group == group && DateTime.parse(event.date).isBefore(DateTime.now()) && event.gameID == '') {
               allEvents.add(event);
             }
-            else if(group == 'all' && DateTime.parse(event.date).isBefore(DateTime.now())) {
+            else if(group == 'all' && DateTime.parse(event.date).isBefore(DateTime.now()) && event.gameID == '') {
               allEvents.add(event);
             }
           }
           else {
-            if(group != 'all' && event.group == group && DateTime.parse(event.date).isAfter(DateTime.now())) {
+            if(group != 'all' && event.group == group && DateTime.parse(event.date).isAfter(DateTime.now()) && event.gameID == '') {
               allEvents.add(event);
             }
-            else if(group == 'all' && DateTime.parse(event.date).isAfter(DateTime.now())) {
+            else if(group == 'all' && DateTime.parse(event.date).isAfter(DateTime.now()) && event.gameID == '') {
               allEvents.add(event);
             }
           }
@@ -97,7 +98,7 @@ class EventListWidget extends ConsumerWidget {
             if(group == 'all') {
               return Column(
                 children: [
-                  UpcomingEventTile(event: allEvents[index]),
+                  UpcomingEventTile(event: allEvents[index], admin: admin,),
                   // const Divider(height: 0, thickness: 0.65),
                 ],
               );
@@ -118,7 +119,7 @@ class EventListWidget extends ConsumerWidget {
           if(group == 'all') {
             return Column(
               children: [
-                UpcomingEventTile(event: allEvents[index]),
+                UpcomingEventTile(event: allEvents[index], admin: admin),
                 // const Divider(height: 0, thickness: 0.65),
               ],
             );

@@ -6,6 +6,7 @@ import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class GroupTile extends StatefulWidget {
 
@@ -22,19 +23,26 @@ class _GroupTileState extends State<GroupTile> {
   bool isFollowing = false;
 
   @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    // precacheImage(CachedNetworkImageProvider(widget.group.backgroundImageURL, cacheKey: widget.group.backgroundImageURL), context);
-    // precacheImage(CachedNetworkImageProvider(widget.group.logoURL, cacheKey: widget.group.logoURL), context);
-  }
-
-
-  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              // color: Colors.black.withOpacity(0.125),
+              // spreadRadius: 0,
+              // blurRadius: 5,
+              // offset: const Offset(0, 1), // changes position of shadow
+              color: Colors.black.withOpacity(0.15),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ]
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
       child: InkWell(onTap: () async {
         HapticFeedback.lightImpact();
         if(widget.group.sport == '') {
@@ -77,8 +85,8 @@ class _GroupTileState extends State<GroupTile> {
                 fadeOutDuration: Duration.zero,
                 placeholderFadeInDuration: Duration.zero,
                 fadeInDuration: Duration.zero,
-                width: 45,
-                height: 45,
+                width: 50,
+                height: 50,
                 placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
               ),
             ),
@@ -88,18 +96,23 @@ class _GroupTileState extends State<GroupTile> {
               children: [
                 Text(
                   widget.group.category,
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: NewsCategories.getCategoryColor(widget.group.category, false),
-                    fontSize: 12,
                   ),
+                  // style: TextStyle(
+                  //   fontWeight: FontWeight.w600,
+                  //   color: NewsCategories.getCategoryColor(widget.group.category, false),
+                  //   fontSize: 12,
+                  // ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   widget.group.name,
-                  style: const TextStyle(
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontSize: 17,
                   ),
                 ),
               ],
@@ -110,18 +123,6 @@ class _GroupTileState extends State<GroupTile> {
             ),
           ],
         ),
-      ),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.125),
-              spreadRadius: 0,
-              blurRadius: 5,
-              offset: const Offset(0, 1), // changes position of shadow
-            ),
-          ]
       ),
     );
   }

@@ -28,6 +28,17 @@ final eventsStreamProvider = StreamProvider.autoDispose<List<Event>>((ref) {
 // watch database
 class Events extends ConsumerWidget {
 
+  // final userStreamProvider =
+  // StreamProvider.autoDispose<PTUser>((ref) {
+  //   final database = ref.watch(databaseProvider);
+  //   return database.userStream();
+  // });
+
+  // final eventsStreamProvider = StreamProvider.autoDispose<List<Event>>((ref) {
+  //   final database = ref.watch(databaseProvider);
+  //   return database.eventsStream();
+  // });
+
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     final userAsyncValue = watch(userStreamProvider);
@@ -64,7 +75,7 @@ class Events extends ConsumerWidget {
                 child: Row(
                   children: [
                         () {
-                      if(user.admin == 'true') {
+                      if(user.admin == 'Admin' || user.admin == 'Student Admin') {
                         return InkWell(
                           onTap: () {
                             Navigator.of(context, rootNavigator: true).pushNamed(
@@ -121,10 +132,13 @@ class Events extends ConsumerWidget {
     );
   }
 
+
   Widget _buildContents(BuildContext context, ScopedReader watch, String admin, List<dynamic> groupsFollowing) {
+
     final eventsAsyncValue = watch(eventsStreamProvider);
 
-    return LoadEventsView(eventsAsyncValue: eventsAsyncValue);
+    return LoadEventsView(eventsAsyncValue: eventsAsyncValue, admin: admin, groupsFollowing: groupsFollowing);
+
     // return eventsAsyncValue.when(
     //   data: (events) {
     //     return CalendarView(events:events);
@@ -184,9 +198,11 @@ class Events extends ConsumerWidget {
 }
 
 class LoadEventsView extends StatefulWidget {
-  const LoadEventsView({required this.eventsAsyncValue});
+  const LoadEventsView({required this.eventsAsyncValue, required this.admin, required this.groupsFollowing});
 
   final AsyncValue<List<Event>> eventsAsyncValue;
+  final String admin;
+  final List<dynamic> groupsFollowing;
 
   @override
   _LoadEventsViewState createState() => _LoadEventsViewState();
@@ -196,22 +212,61 @@ class _LoadEventsViewState extends State<LoadEventsView> {
 
   bool loadingData = true;
 
+  List<Event> allEvents = [];
+  List<Event> filteredEvents = [];
+  List<dynamic> lastGroupsFollowing = [];
+
+  AsyncValue<List<Event>>? lastAsyncValue;
+
+  Timer? _timer;
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _timer!.cancel();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    List<Event> allEvents = [];
-    widget.eventsAsyncValue.whenData((events) {
-      allEvents = events;
-      Timer(const Duration(milliseconds: 250), () {
+    widget.eventsAsyncValue.whenData((events) async {
+      if(events.length != allEvents.length || lastGroupsFollowing.length != widget.groupsFollowing.length) {
+        // if(widget.groupsFollowing.length > 0) {
+        //
+        // }
+
         setState(() {
-          loadingData = false;
+          allEvents.clear();
+          filteredEvents.clear();
+          lastGroupsFollowing.clear();
         });
-      });
+        for(Event event in events) {
+          if(widget.groupsFollowing.contains(event.group)) {
+            filteredEvents.add(event);
+          }
+        }
+        setState(() {
+          allEvents = events;
+          lastGroupsFollowing = widget.groupsFollowing;
+        });
+
+        _timer = Timer(const Duration(milliseconds: 150), () {
+          setState(() {
+            loadingData = false;
+          });
+        });
+        // if(loadingData == false) {
+        //   _timer!.cancel();
+        // }
+      }
+      //
     });
 
     if(loadingData) {
       return const LoadingEventsScroll();
     }
-    return CalendarView(events:allEvents);
+
+    return CalendarView(events:allEvents, admin: widget.admin);
 
   }
+
 }

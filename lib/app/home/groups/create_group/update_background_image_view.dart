@@ -48,7 +48,7 @@ class _UpdateBackgroundImageViewState extends State<UpdateBackgroundImageView> {
         _loading = true;
       });
       final database = context.read<FirestoreDatabase>(databaseProvider);
-      final _backgroundImageURL = await database.uploadFile(_backgroundImage!);
+      final _backgroundImageURL = await database.uploadFile(_backgroundImage!, widget.group.name);
       await database.setGroupBackgroundImage(widget.group.id, _backgroundImageURL);
       await Future.delayed(const Duration(seconds: 1));
       Navigator.of(context).popUntil((route) => !route.hasActiveRouteBelow);

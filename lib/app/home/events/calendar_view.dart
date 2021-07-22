@@ -1,15 +1,11 @@
-import 'dart:collection';
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/events/calendar_event_list_tile.dart';
-import 'package:get_up_park/app/home/events/event_list_tile.dart';
 import 'package:get_up_park/app/home/events/event_model.dart';
-import 'package:get_up_park/constants/empty_states.dart';
-import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
-import 'package:get_up_park/services/firestore_database.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 
@@ -26,12 +22,12 @@ final kNow = DateTime.now();
 final kFirstDay = DateTime(kNow.year, kNow.month - 3, kNow.day);
 final kLastDay = DateTime(kNow.year, kNow.month + 3, kNow.day);
 
-
 class CalendarView extends StatefulWidget {
 
-  CalendarView({required this.events});
+  CalendarView({required this.events, required this.admin});
 
   final List<dynamic> events;
+  final String admin;
 
   @override
   _CalendarViewState createState() => _CalendarViewState();
@@ -39,6 +35,7 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   late final ValueNotifier<List<Event>> _selectedEvents;
+  // List<Event>? _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.week;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
@@ -53,12 +50,13 @@ class _CalendarViewState extends State<CalendarView> {
 
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    // _selectedEvents = _getEventsForDay(_selectedDay!);
     prevPageEvents = _getEventsForDay(DateTime.now());
   }
 
   @override
   void dispose() {
-    _selectedEvents.dispose();
+    // _selectedEvents.dispose();
     super.dispose();
   }
 
@@ -148,7 +146,7 @@ class _CalendarViewState extends State<CalendarView> {
           calendarFormat: _calendarFormat,
           rangeSelectionMode: _rangeSelectionMode,
           eventLoader: _getEventsForDay,
-          startingDayOfWeek: StartingDayOfWeek.saturday,
+          startingDayOfWeek: StartingDayOfWeek.sunday,
           calendarStyle: CalendarStyle(
             todayTextStyle: const TextStyle(
               color: Colors.white,
@@ -210,6 +208,88 @@ class _CalendarViewState extends State<CalendarView> {
           thickness: 1,
           height: 0,
         ),
+        // Expanded(
+        //   child: PageView.builder(
+        //     controller: controller,
+        //     itemCount: daysInRange(kFirstDay, kLastDay).length,
+        //     scrollDirection: Axis.horizontal,
+        //     onPageChanged: (index) {
+        //       // print(index);
+        //       // print(lastPageIndex);
+        //       if(lastPageIndex > index) {
+        //         setState(() {
+        //           _onDaySelected(_selectedDay!.subtract(const Duration(days: 1)), _focusedDay);
+        //           // _selectedDay = _selectedDay!.add(const Duration(days: 1));
+        //           lastPageIndex = index;
+        //         });
+        //       }
+        //       else {
+        //         setState(() {
+        //           _onDaySelected(_selectedDay!.add(const Duration(days: 1)), _focusedDay);
+        //           lastPageIndex = index;
+        //         });
+        //       }
+        //
+        //     },
+        //     itemBuilder: (context, index) {
+        //       return _selectedEvents!.isEmpty ?
+        //       EmptyContent(title: 'No events on this date', message: 'Only groups you are following will appear in the calender', center: false)
+        //           : ListView.separated(
+        //         itemCount: _selectedEvents!.length,
+        //         separatorBuilder: (context, index){
+        //           return const Divider(height: 0, thickness: 0.5,);
+        //         },
+        //         itemBuilder: (context, index) {
+        //           return InkWell(
+        //             onTap: () {
+        //               if(_selectedEvents![index].gameID != '') {
+        //                 Navigator.of(context, rootNavigator: true).pushNamed(
+        //                     AppRoutes.gameView,
+        //                     arguments: {
+        //                       'admin': widget.admin,
+        //                       'gameID': _selectedEvents![index].gameID,
+        //                     }
+        //                 );
+        //               }
+        //               else {
+        //                 Navigator.of(context, rootNavigator: true).pushNamed(
+        //                     AppRoutes.eventView,
+        //                     arguments: {
+        //                       'event': _selectedEvents![index],
+        //                     }
+        //                 );
+        //               }
+        //             },
+        //             child: Container(
+        //               padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
+        //               // margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        //               child: Row(
+        //                 children: [
+        //                   ClipRRect(
+        //                     borderRadius: BorderRadius.circular(30),
+        //                     child: CachedNetworkImage(
+        //                       memCacheHeight: 1000,
+        //                       memCacheWidth: 1000,
+        //                       fadeInDuration: Duration.zero,
+        //                       placeholderFadeInDuration: Duration.zero,
+        //                       fadeOutDuration: Duration.zero,
+        //                       imageUrl: _selectedEvents![index].groupImageURL,
+        //                       fit: BoxFit.fitWidth,
+        //                       width: 45,
+        //                       height: 45,
+        //                       placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+        //                     ),
+        //                   ),
+        //                   Flexible(child: CalendarEventListTile(event: _selectedEvents![index])),
+        //                 ],
+        //               ),
+        //             ),
+        //           );
+        //         },
+        //       );
+        //     },
+        //   ),
+        // )
         Expanded(
           child: ValueListenableBuilder<List<Event>>(
             valueListenable: _selectedEvents,
@@ -247,12 +327,23 @@ class _CalendarViewState extends State<CalendarView> {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () {
-                          Navigator.of(context, rootNavigator: true).pushNamed(
-                              AppRoutes.eventView,
-                              arguments: {
-                                'event': _selectedEvents.value[index],
-                              }
-                          );
+                          if(_selectedEvents.value[index].gameID != '') {
+                            Navigator.of(context, rootNavigator: true).pushNamed(
+                                AppRoutes.gameView,
+                                arguments: {
+                                  'admin': widget.admin,
+                                  'gameID': _selectedEvents.value[index].gameID,
+                                }
+                            );
+                          }
+                          else {
+                            Navigator.of(context, rootNavigator: true).pushNamed(
+                                AppRoutes.eventView,
+                                arguments: {
+                                  'event': _selectedEvents.value[index],
+                                }
+                            );
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),

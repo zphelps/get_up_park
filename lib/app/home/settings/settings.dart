@@ -108,7 +108,7 @@ class Settings extends StatelessWidget {
           const Divider(height: 0),
           ListTile(
             onTap: () async {
-              if(user.admin == 'true') {
+              if(user.admin == 'Admin') {
                 Navigator.of(context, rootNavigator: true).pushNamed(
                     AppRoutes.userListView,
                     arguments: {
@@ -139,7 +139,7 @@ class Settings extends StatelessWidget {
               color: Colors.black,
             ),
             title: Text(
-              user.admin == 'true' ? 'Admin' : 'Student',
+              user.admin,
               style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -147,7 +147,7 @@ class Settings extends StatelessWidget {
               ),
             ),
             trailing: Icon(
-              user.admin == 'true' ? Icons.chevron_right : Icons.launch,
+              user.admin == 'Admin' ? Icons.chevron_right : Icons.launch,
               size: 22,
             ),
           ),

@@ -4,6 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
+import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
@@ -32,7 +33,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
 
   Map? dataFromGroupSelector;
 
-  final articleCharacterCountMinimum = 300;
+  final articleCharacterCountMinimum = 400;
 
   Future getImageFromPicker() async {
     final List<Media>? pickedFile = await ImagesPicker.pick(
@@ -57,20 +58,30 @@ class _CreateNewsViewState extends State<CreateNewsView> {
   File? _image;
   String? _gameID;
   String? _sport;
+  String? _homeScore;
   String? _opponentName;
+  String? _opponentScore;
   String? _opponentLogoURL;
+  bool _isDone = false;
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
     if((_title ?? '').length > 0) {
-      if(_body != null && _group != null && _image != null && _title!.length > 35) {
+      if(_body != null && _group != null && _image != null && _title!.length > 20) {
         form.save();
         return true;
       }
       return false;
     }
     else {
-      if(_body != null && _group != null) {
+      if(_group != null && _body != null) {
+        if(_gameID != null) {
+          if(_opponentScore != null && _homeScore != null) {
+            form.save();
+            return true;
+          }
+          return false;
+        }
         form.save();
         return true;
       }
@@ -90,22 +101,46 @@ class _CreateNewsViewState extends State<CreateNewsView> {
         final database = context.read<FirestoreDatabase>(databaseProvider);
         String? _imageURL;
         if(_image!=null) {
-          _imageURL = await database.uploadFile(_image!);
+          _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
         }
-        final article = Article(
-          id: documentIdFromCurrentDate(),
-          title: _title ?? '',
-          body: _body!,
-          imageURL: _imageURL ?? '',
-          category: _category!,
-          group: _group!,
-          groupLogoURL: _groupLogoURL!,
-          date: DateTime.now().toString(),
-          gameID: _gameID ?? '',
-        );
-        await database.setArticle(article);
+
+        if((_gameID ?? '').length > 0) {
+          final article = Article(
+              id: documentIdFromCurrentDate(),
+              title: _title ?? '',
+              body: _body!,
+              imageURL: _imageURL ?? '',
+              category: _category!,
+              group: _group!,
+              groupLogoURL: _groupLogoURL!,
+              date: DateTime.now().toString(),
+              gameID: _gameID ?? '',
+              gameDone: 'true'
+          );
+          await database.setArticle(article);
+          sendNotification(article, opponent: _opponentName!, opponentLogoURL: _opponentLogoURL!);
+        }
+        else {
+          final article = Article(
+              id: documentIdFromCurrentDate(),
+              title: _title ?? '',
+              body: _body!,
+              imageURL: _imageURL ?? '',
+              category: _category!,
+              group: _group!,
+              groupLogoURL: _groupLogoURL!,
+              date: DateTime.now().toString(),
+              gameID: _gameID ?? '',
+              gameDone: ''
+          );
+          await database.setArticle(article);
+          await sendNotification(article);
+        }
+        if((_homeScore ?? '').length > 0 && (_opponentScore ?? '').length > 0) {
+          await database.updateGameScore(_gameID!, _opponentScore!, _homeScore!, 'true');
+        }
         // await sendNewsNotifications(article);
-        await sendNotification(article);
+
         //await Future.delayed(const Duration(seconds: 1));
         Navigator.of(context).pop();
       } catch (e) {
@@ -154,13 +189,19 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               child: Chip(
                 backgroundColor: () {
                   if((_title ?? '').length > 0) {
-                    if(_body != null && _group != null && _image != null && _title!.length > 35) {
+                    if(_body != null && _group != null && _image != null && _title!.length > 20) {
                       return Colors.red;
                     }
                     return Colors.red[200];
                   }
                   else {
-                    if(_body != null && _group != null) {
+                    if(_group != null && _body != null) {
+                      if(_gameID != null) {
+                        if(_opponentScore != null && _homeScore != null) {
+                          return Colors.red;
+                        }
+                        return Colors.red[200];
+                      }
                       return Colors.red;
                     }
                     return Colors.red[200];
@@ -394,6 +435,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
                           dataFromGroupSelector!['opponentLogoURL'];
                           _gameID = dataFromGroupSelector!['gameID'];
                         });
+                        print(_gameID);
                       },
                       child: ListTile(
                         visualDensity: const VisualDensity(vertical: -4),
@@ -444,6 +486,138 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               else {
                 return const SizedBox(height: 0);
               }
+            }(),
+            () {
+              if((_gameID ?? '').length > 0) {
+                return Column(
+                  children: [
+                    TextFormField(
+                      textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                        labelText: 'Panther score',
+                        labelStyle: TextStyle(
+                          color: Colors.grey,
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5,
+                            )
+                        ),
+                        border: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 0.5,
+                            )
+                        ),
+                        disabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 0.5,
+                            )
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5,
+                            )
+                        ),
+                      ),
+                      initialValue: _homeScore,
+                      keyboardAppearance: Brightness.light,
+                      validator: (value) =>
+                      (value ?? '').isNotEmpty
+                          ? null
+                          : 'Panther score can\'t be empty',
+                      onChanged: (value) {
+                        setState(() {
+                          _homeScore = value;
+                        });
+                      }
+                    ),
+                    const SizedBox(height: 2),
+                    TextFormField(
+                      textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                        labelText: '${_opponentName} score',
+                        labelStyle: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                        enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5,
+                            )
+                        ),
+                        border: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 0.5,
+                            )
+                        ),
+                        disabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 0.5,
+                            )
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5,
+                            )
+                        ),
+                      ),
+                      initialValue: _opponentScore,
+                      keyboardAppearance: Brightness.light,
+                      validator: (value) =>
+                      (value ?? '').isNotEmpty
+                          ? null
+                          : 'Opponent score can\'t be empty',
+                      onChanged: (value)  {
+                        setState(() {
+                          _opponentScore = value;
+                        });
+                      }
+                    ),
+                    // ListTile(
+                    //   onTap: () {
+                    //     setState(() {
+                    //       _isDone = !_isDone;
+                    //     });
+                    //   },
+                    //   visualDensity: const VisualDensity(vertical: -4),
+                    //   contentPadding: const  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    //   title: const Text(
+                    //     'Final Score?',
+                    //     style: TextStyle(
+                    //       color: Colors.black,
+                    //       fontWeight: FontWeight.w500,
+                    //       fontSize: 15,
+                    //     ),
+                    //   ),
+                    //   trailing: CircleAvatar(
+                    //     radius: 16,
+                    //     backgroundColor: Colors.white,
+                    //     child: Icon(
+                    //       _isDone ? Icons.check_circle : Icons.check_circle_outline,
+                    //       color: _isDone ? Colors.red : Colors.grey,
+                    //     ),
+                    //   ),
+                    // ),
+                    // const Divider(
+                    //   height: 0,
+                    //   thickness: 0.5,
+                    //   color: Colors.grey,
+                    // ),
+                  ],
+                );
+              }
+              return const SizedBox(height: 0);
             }(),
               () {
                 if(_image == null) {

@@ -53,7 +53,7 @@ class ArticleView extends StatelessWidget {
             ),
             actions: [
                   () {
-                if(admin == 'true') {
+                if(admin == 'Admin' || admin == 'Student Admin') {
                   return Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: CircleAvatar(

@@ -8,6 +8,7 @@ import 'package:get_up_park/app/home/news/news.dart';
 import 'package:get_up_park/app/home/settings/settings.dart';
 import 'package:get_up_park/app/home/sports/sports.dart';
 import 'package:get_up_park/app/home/tab_item.dart';
+import 'package:get_up_park/routing/app_router.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     TabItem.news: GlobalKey<NavigatorState>(),
     TabItem.events: GlobalKey<NavigatorState>(),
     TabItem.groups: GlobalKey<NavigatorState>(),
-    TabItem.sports: GlobalKey<NavigatorState>(),
+    // TabItem.sports: GlobalKey<NavigatorState>(),
   };
 
 
@@ -34,7 +35,7 @@ class _HomePageState extends State<HomePage> {
       TabItem.news: (_) => News(),
       TabItem.events: (_) => Events(),
       TabItem.groups: (_) => Groups(),
-      TabItem.sports: (_) => Sports(),
+      // TabItem.sports: (_) => Sports(),
     };
   }
 

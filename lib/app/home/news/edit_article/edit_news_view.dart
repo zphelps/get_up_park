@@ -4,6 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
+import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
@@ -98,7 +99,7 @@ class _EditNewsViewState extends State<EditNewsView> {
         final database = context.read<FirestoreDatabase>(databaseProvider);
         String? _imageURL;
         if(_image!=null) {
-          _imageURL = await database.uploadFile(_image!);
+          _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
         }
         final article = Article(
           id: widget.article.id,
@@ -110,6 +111,7 @@ class _EditNewsViewState extends State<EditNewsView> {
           groupLogoURL: _groupLogoURL!,
           date: widget.article.date,
           gameID: _gameID ?? '',
+          gameDone: widget.article.gameDone,
         );
         await database.updateArticle(article);
         Navigator.of(context).pop();
