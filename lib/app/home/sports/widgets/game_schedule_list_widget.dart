@@ -49,7 +49,7 @@ class GameScheduleListWidget extends ConsumerWidget {
     });
 
     if(filteredGames.isEmpty && !selectGame) {
-      return EmptyContent(title: 'No ${group.name} results found', message: 'Check back later.',);
+      return Center(child: EmptyContent(title: 'No ${group.name} results found', message: 'Check back later.',));
     }
 
     return ListView.builder(

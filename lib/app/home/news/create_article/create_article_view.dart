@@ -125,7 +125,7 @@ class _CreateArticleViewState extends State<CreateArticleView> {
         _loading = true;
       });
       final database = context.read<FirestoreDatabase>(databaseProvider);
-      final _imageURL = await database.uploadFile(_image!);
+      final _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
       final article = Article(
         id: documentIdFromCurrentDate(),
         title: _title!,
@@ -136,6 +136,7 @@ class _CreateArticleViewState extends State<CreateArticleView> {
         groupLogoURL: _groupLogoURL!,
         date: DateTime.now().toString(),
         gameID: '',
+        gameDone: 'false'
       );
       await database.setArticle(article);
       await Future.delayed(const Duration(seconds: 1));
@@ -184,6 +185,7 @@ class _CreateArticleViewState extends State<CreateArticleView> {
         groupLogoURL: _groupLogoURL!,
         date: DateTime.now().toString(),
         gameID: '',
+        gameDone: 'false'
       )): _buildContents(),
     );
   }

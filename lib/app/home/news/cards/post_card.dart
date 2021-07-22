@@ -7,6 +7,7 @@ import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,16 +22,16 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), //6, 3
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), //6, 3
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            // color: Colors.black.withOpacity(0.15),
-            // spreadRadius: 1,
-            // blurRadius: 6,
-            // offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.15),
+            spreadRadius: 0,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
             // color: Colors.black.withOpacity(0.2),
             // spreadRadius: 0,
             // blurRadius: 3,
@@ -39,18 +40,28 @@ class PostCard extends StatelessWidget {
         ]
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
               onTap: () {
-                Navigator.of(context, rootNavigator: true).pushNamed(
-                    AppRoutes.groupView,
-                    arguments: {
-                      'group':  group,
-                    }
-                );
+                if(group.sport != '') {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                      AppRoutes.sportsProfileView,
+                      arguments: {
+                        'group':  group,
+                      }
+                  );
+                }
+                else {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                      AppRoutes.groupView,
+                      arguments: {
+                        'group':  group,
+                      }
+                  );
+                }
               },
               dense: true,
               horizontalTitleGap: 6,
@@ -101,7 +112,7 @@ class PostCard extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(15.0))
                 ),
                 itemBuilder: (BuildContext bc) {
-                  if(admin == 'true') {
+                  if(admin == 'Admin' || admin == 'Student Admin') {
                     return [
                       const PopupMenuItem(child: Text("Delete"), value: "delete"),
                       const PopupMenuItem(
@@ -184,15 +195,20 @@ class PostCard extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   fontSize: 15,
                 ),
-                style: const TextStyle(
-                  fontSize: 16,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
-                  // fontFamily: 'SanFrancisco',
                 ),
+                // style: const TextStyle(
+                //   fontSize: 16,
+                //   fontWeight: FontWeight.w400,
+                //   color: Colors.black,
+                //   // fontFamily: 'SanFrancisco',
+                // ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
           ],
         ),
       ),

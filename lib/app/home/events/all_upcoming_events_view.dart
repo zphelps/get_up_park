@@ -26,7 +26,7 @@ class AllUpcomingEventsView extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: EventListWidget(),
+        child: EventListWidget(admin: 'false'),
       ),
     );
   }

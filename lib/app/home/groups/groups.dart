@@ -10,14 +10,12 @@ import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 final userStreamProvider =
-StreamProvider.autoDispose.family<PTUser, String>((ref, userID) {
-  print(userID);
+StreamProvider.autoDispose<PTUser>((ref) {
   final database = ref.watch(databaseProvider);
-  // return database.userStream(userID: userID);
   return database.userStream();
-
 });
 
 // watch database
@@ -25,9 +23,7 @@ class Groups extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseAuth = context.read(firebaseAuthProvider);
-    final user = firebaseAuth.currentUser!;
-    final userAsyncValue = watch(userStreamProvider(user.uid));
+    final userAsyncValue = watch(userStreamProvider);
     return userAsyncValue.when(
       data: (user) {
         return Scaffold(
@@ -61,7 +57,7 @@ class Groups extends ConsumerWidget {
                 child: Row(
                   children: [
                     () {
-                      if(user.admin == 'true') {
+                      if(user.admin == 'Admin') {
                         return InkWell(
                           onTap: () {
                             Navigator.of(context, rootNavigator: true).pushNamed(

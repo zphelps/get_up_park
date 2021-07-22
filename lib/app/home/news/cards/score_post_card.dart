@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
+import 'package:get_up_park/app/home/sports/game_model.dart';
+import 'package:get_up_park/app/home/sports/tiles/game_result_post_tile.dart';
+import 'package:get_up_park/app/home/sports/tiles/game_results_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
@@ -12,11 +15,12 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ImagePostCard extends StatelessWidget {
-  const ImagePostCard({required this.article, required this.admin, required this.group});
+class ScorePostCard extends StatelessWidget {
+  const ScorePostCard({required this.article, required this.admin, required this.group, required this.game});
 
   final Article article;
   final Group group;
+  final Game game;
   final String admin;
 
   @override
@@ -24,23 +28,23 @@ class ImagePostCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), //6, 3
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15), //6
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              spreadRadius: 0,
-              blurRadius: 15,
-              offset: const Offset(0, 3),
-              // color: Colors.black.withOpacity(0.2),
-              // spreadRadius: 0,
-              // blurRadius: 3,
-              // offset: const Offset(0, 1),
-            )
-          ]
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            spreadRadius: 0,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+            // color: Colors.black.withOpacity(0.2),
+            // spreadRadius: 0,
+            // blurRadius: 3,
+            // offset: const Offset(0, 1),
+          )
+        ]
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6), //15, 6
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -62,11 +66,17 @@ class ImagePostCard extends StatelessWidget {
                       }
                   );
                 }
+                // Navigator.of(context, rootNavigator: true).pushNamed(
+                //     AppRoutes.groupView,
+                //     arguments: {
+                //       'group':  group,
+                //     }
+                // );
               },
               dense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-              horizontalTitleGap: 8,
+              horizontalTitleGap: 6,
               minVerticalPadding: 0,
+              contentPadding: EdgeInsets.zero,
               visualDensity: const VisualDensity(vertical: -1),
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(30),
@@ -74,12 +84,12 @@ class ImagePostCard extends StatelessWidget {
                   memCacheHeight: 300,
                   memCacheWidth: 300,
                   imageUrl: article.groupLogoURL,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitHeight,
                   fadeOutDuration: Duration.zero,
                   placeholderFadeInDuration: Duration.zero,
                   fadeInDuration: Duration.zero,
-                  width: 40,
-                  height: 40,
+                  width: 38,
+                  height: 38,
                   placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
                 ),
               ),
@@ -92,8 +102,8 @@ class ImagePostCard extends StatelessWidget {
                 ),
               ),
               subtitle: Text(
-                  DateFormat.yMMMMd('en_US')
-                      .format(DateTime.parse(article.date)),
+                DateFormat.yMMMMd('en_US')
+                    .format(DateTime.parse(article.date)),
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[800],
@@ -175,81 +185,93 @@ class ImagePostCard extends StatelessWidget {
                       throw "Could not launch $url";
                     }
                   }
+                  // Note You must create respective pages for navigation
+                  //Navigator.pushNamed(context, route);
                 },
               ),
             ),
             const SizedBox(height: 2),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: ExpandableText(
+                article.body,
+                expandText: 'show more',
+                collapseText: 'show less',
+                maxLines: 5,
+                expandOnTextTap: true,
+                linkColor: Colors.grey[600],
+                linkStyle: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 15,
+                ),
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                ),
+                // style: const TextStyle(
+                //   fontSize: 16,
+                //   fontWeight: FontWeight.w400,
+                //   color: Colors.black,
+                //   // fontFamily: 'SanFrancisco',
+                // ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Divider(height: 0, thickness: 0.25, color: Colors.grey[400],),
+            GameResultPostTile(game: game, admin: admin, group: group),
             () {
-              if(article.body.length > 1) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ExpandableText(
-                        article.body,
-                        expandText: 'show more',
-                        collapseText: 'show less',
-                        maxLines: 5,
-                        expandOnTextTap: true,
-                        linkColor: Colors.grey[600],
-                        linkStyle: const TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 15,
-                        ),
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
-                        // style: const TextStyle(
-                        //   fontSize: 16,
-                        //   fontWeight: FontWeight.w400,
-                        //   color: Colors.black,
-                        //   fontStyle: GoogleFonts.
-                        //   // fontFamily: 'SanFrancisco',
-                        // ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
+              if(article.imageURL != '') {
+                return Column(
+                  children: [
+                    Divider(height: 0, thickness: 0.25, color: Colors.grey[400],),
+                    const SizedBox(height: 6),
+                  ],
                 );
               }
               return const SizedBox(height: 0);
             }(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context, rootNavigator: true).pushNamed(
-                      AppRoutes.fullScreenImageView,
-                      arguments: {
-                        'imageURL': article.imageURL,
-                      }
-                  );
-                },
-                child: Hero(
-                  tag: article.imageURL,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6), //5
-                    child: CachedNetworkImage(
-                      memCacheHeight: 9000,
-                      memCacheWidth: 9000,
-                      imageUrl: article.imageURL,
-                      fadeOutDuration: Duration.zero,
-                      placeholderFadeInDuration: Duration.zero,
-                      fadeInDuration: Duration.zero,
-                      fit: BoxFit.fitWidth,
-                      // width: 374,
-                      width: MediaQuery.of(context).size.width * 0.95,
-                      // height: 300,
-                      placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+            const SizedBox(height: 6),
+            () {
+              if(article.imageURL != '') {
+                return Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context, rootNavigator: true).pushNamed(
+                            AppRoutes.fullScreenImageView,
+                            arguments: {
+                              'imageURL': article.imageURL,
+                            }
+                        );
+                      },
+                      child: Hero(
+                        tag: article.imageURL,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6), //5
+                          child: CachedNetworkImage(
+                            memCacheHeight: 9000,
+                            memCacheWidth: 9000,
+                            imageUrl: article.imageURL,
+                            fadeOutDuration: Duration.zero,
+                            placeholderFadeInDuration: Duration.zero,
+                            fadeInDuration: Duration.zero,
+                            fit: BoxFit.fitWidth,
+                            // width: 374,
+                            width: MediaQuery.of(context).size.width * 0.95,
+                            // height: 300,
+                            placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              }
+              return const SizedBox(height: 0);
+            }(),
           ],
         ),
       ),

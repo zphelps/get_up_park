@@ -134,7 +134,7 @@ class _EditArticleViewState extends State<EditArticleView> {
       final database = context.read<FirestoreDatabase>(databaseProvider);
       String _imageURL = widget.article.imageURL;
       if(fileImage) {
-        _imageURL = await database.uploadFile(_image!);
+        _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
       }
       final article = Article(
         id: widget.article.id,
@@ -146,6 +146,7 @@ class _EditArticleViewState extends State<EditArticleView> {
         groupLogoURL: _groupLogoURL!,
         date: DateTime.now().toString(),
         gameID: '',
+        gameDone: widget.article.gameDone,
       );
       await database.updateArticle(article);
       await Future.delayed(const Duration(seconds: 1));
@@ -202,6 +203,7 @@ class _EditArticleViewState extends State<EditArticleView> {
         groupLogoURL: _groupLogoURL!,
         date: DateTime.now().toString(),
         gameID: '',
+        gameDone: widget.article.gameDone,
       ), _image == null ? false : true): _buildContents(),
     );
   }

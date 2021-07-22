@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_up_park/app/home/events/event_model.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:logger/logger.dart';
 

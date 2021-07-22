@@ -87,7 +87,7 @@ class EventsByDateView extends ConsumerWidget {
                             ),
                           ),
                           //const SizedBox(height: 10),
-                          EventListWidget(group: group.name, date: date),
+                          EventListWidget(group: group.name, date: date, admin: 'false'),
                         ],
                       ),
                     ),

@@ -69,6 +69,8 @@ class _CreateGroupEventViewState extends State<CreateGroupEventView> {
           location: _location!,
           group: _group!,
           date: _date!,
+          gameID: '',
+          imageURL: ''
         );
         await database.setEvent(event);
         await Future.delayed(const Duration(seconds: 1));

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 @immutable
 class Event extends Equatable {
-  const Event({required this.id, required this.title, required this.description, required this.group, required this.date, required this.location, required this.groupImageURL});
+  const Event({required this.id, required this.title,
+    required this.description, required this.group, required this.date,
+    required this.location, required this.groupImageURL, required this.gameID, required this.imageURL});
   final String id;
   final String title;
   final String description;
@@ -11,9 +13,11 @@ class Event extends Equatable {
   final String date;
   final String location;
   final String groupImageURL;
+  final String gameID;
+  final String imageURL;
 
   @override
-  List<Object> get props => [id, title, description, group, date, location, groupImageURL];
+  List<Object> get props => [id, title, description, group, date, location, groupImageURL, gameID, imageURL];
 
   @override
   bool get stringify => true;
@@ -53,7 +57,18 @@ class Event extends Equatable {
       throw StateError('missing groupImageURL for group: $documentId');
     }
 
-    return Event(id: documentId, title: title, description: description, group: group, date: date, location: location, groupImageURL: groupImageURL);
+    final gameID = data['gameID'] as String?;
+    if (gameID == null) {
+      throw StateError('missing gameID for group: $documentId');
+    }
+
+    final imageURL = data['imageURL'] as String?;
+    if (imageURL == null) {
+      throw StateError('missing imageURL for group: $documentId');
+    }
+
+    return Event(id: documentId, title: title, description: description,
+        group: group, date: date, location: location, groupImageURL: groupImageURL, gameID: gameID, imageURL: imageURL);
   }
 
   Map<String, dynamic> toMap() {
@@ -64,6 +79,8 @@ class Event extends Equatable {
       'date': date,
       'location': location,
       'groupImageURL': groupImageURL,
+      'gameID': gameID,
+      'imageURL': imageURL,
     };
   }
 }

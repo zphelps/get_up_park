@@ -36,7 +36,7 @@ class _GroupEventsViewState extends State<GroupEventsView> {
         ),
         actions: [
               () {
-            if(widget.admin == 'true') {
+            if(widget.admin == 'Admin' || widget.admin == 'Student Admin') {
               return IconButton(
                 padding: const EdgeInsets.only(right: 16),
                 onPressed: () {
@@ -74,7 +74,7 @@ class _GroupEventsViewState extends State<GroupEventsView> {
               ),
             ),
             const SizedBox(height: 8),
-            EventListWidget(group: widget.group.name),
+            EventListWidget(group: widget.group.name, admin: widget.admin),
             const Divider(height: 0, thickness: 1),
             const SizedBox(height: 15),
             const Padding(
@@ -89,7 +89,7 @@ class _GroupEventsViewState extends State<GroupEventsView> {
               ),
             ),
             const SizedBox(height: 8),
-            EventListWidget(group: widget.group.name, past: true),
+            EventListWidget(group: widget.group.name, past: true, admin: widget.admin),
             const Divider(height: 0, thickness: 1),
             const SizedBox(height: 10),
             // Center(

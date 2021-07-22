@@ -9,8 +9,8 @@ import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GameScheduleTile extends StatelessWidget {
-  const GameScheduleTile({required this.game, required this.admin, required this.group});
+class GameResultPostTile extends StatelessWidget {
+  const GameResultPostTile({required this.game, required this.admin, required this.group});
 
   final Game game;
   final String admin;
@@ -29,7 +29,7 @@ class GameScheduleTile extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         child: Row(
           children: [
             Column(
@@ -38,17 +38,17 @@ class GameScheduleTile extends StatelessWidget {
                 Row(
                   children: [
                     const Image(
-                      image: AssetImage('assets/pantherHead.png'),
+                      image: AssetImage('assets/pantherHeadLowRes.png'),
                       fit: BoxFit.fitWidth,
                       height: 25,
                       width: 25,
                     ),
                     const SizedBox(width: 10),
-                    const Text(
+                    Text(
                       'Panthers',
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                      style: TextStyle(
+                          color: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? Colors.black : Colors.grey[700],
+                          fontWeight: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? FontWeight.w700 : FontWeight.w400,
                           fontSize: 14
                       ),
                     ),
@@ -75,9 +75,9 @@ class GameScheduleTile extends StatelessWidget {
                     const SizedBox(width: 10),
                     Text(
                       game.opponentName,
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                      style: TextStyle(
+                          color: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? Colors.black : Colors.grey[700],
+                          fontWeight: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? FontWeight.w700 : FontWeight.w400,
                           fontSize: 14
                       ),
                     ),
@@ -86,6 +86,28 @@ class GameScheduleTile extends StatelessWidget {
               ],
             ),
             const Spacer(),
+            Column(
+              children: [
+                Text(
+                  game.homeScore,
+                  style: TextStyle(
+                      color: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? Colors.black : Colors.grey[700],
+                      fontWeight: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? FontWeight.w700 : FontWeight.w400,
+                      fontSize: 15
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  game.opponentScore,
+                  style: TextStyle(
+                      color: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? Colors.black : Colors.grey[700],
+                      fontWeight: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? FontWeight.w700 : FontWeight.w400,
+                      fontSize: 15
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
             Container(height: 50, width: 0.25, color: Colors.grey[400],),
             const SizedBox(width: 5),
             Container(
@@ -95,19 +117,19 @@ class GameScheduleTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${DateFormat.E('en_US').format(DateTime.parse(game.date))} ${DateFormat.Md('en_US').format(DateTime.parse(game.date))}',
+                    'Final',
                     style: TextStyle(
-                      color: Colors.grey[800],
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    DateFormat.jm('en_US').format(DateTime.parse(game.date)),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
+                    '${DateFormat.E('en_US').format(DateTime.parse(game.date))} ${DateFormat.Md('en_US').format(DateTime.parse(game.date))}',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontWeight: FontWeight.w400,
                       fontSize: 12,
                     ),
                   ),

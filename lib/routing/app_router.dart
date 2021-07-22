@@ -20,7 +20,8 @@ import 'package:get_up_park/app/home/sports/full_schedule_view.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/home/sports/game_view.dart';
 import 'package:get_up_park/app/home/sports/select_opponent_view.dart';
-import 'package:get_up_park/app/home/sports/update_game/update_game_view.dart';
+import 'package:get_up_park/app/home/sports/update_game/post_game_update_view.dart';
+import 'package:get_up_park/app/home/sports/update_game/update_game_score_view.dart';
 import 'package:get_up_park/app/sign_in/register_user_view.dart';
 import 'package:get_up_park/app/sign_in/reset_password_view.dart';
 import 'package:get_up_park/app/sign_in/sign_in_view.dart';
@@ -104,6 +105,8 @@ class AppRoutes {
   static const createGameView = '/create-game-view';
 
   static const editGameView = '/edit-game-view';
+
+  static const postGameUpdateView = '/post-game-update-view';
 
   static const updateGroupBackgroundImageView = '/update-group-background-image-view';
 
@@ -211,11 +214,10 @@ class AppRouter {
         );
       case AppRoutes.gameView:
         final mapArgs = args as Map<String, dynamic>;
-        final game = mapArgs['game'] as Game;
+        final gameID = mapArgs['gameID'] as String;
         final admin = mapArgs['admin'] as String;
-        final group = mapArgs['group'] as Group;
         return CupertinoPageRoute<dynamic>(
-          builder: (_) => GameView(game: game, admin: admin, group: group), //pages other than main pages
+          builder: (_) => GameView(gameID: gameID, admin: admin), //pages other than main pages
           settings: settings,
         );
       case AppRoutes.createGameView:
@@ -234,12 +236,21 @@ class AppRouter {
           settings: settings,
           fullscreenDialog: true,
         );
+      case AppRoutes.postGameUpdateView:
+        final mapArgs = args as Map<String, dynamic>;
+        final game = mapArgs['game'] as Game;
+        final groupLogoURL = mapArgs['groupLogoURL'] as String;
+        return CupertinoPageRoute<dynamic>(
+          builder: (_) => PostGameUpdateView(game: game, groupLogoURL: groupLogoURL), //pages other than main pages
+          settings: settings,
+          fullscreenDialog: true,
+        );
       case AppRoutes.updateGameView:
         final mapArgs = args as Map<String, dynamic>;
         final game = mapArgs['game'] as Game;
-        final group = mapArgs['group'] as Group;
+        final event = mapArgs['event'] as Event;
         return CupertinoPageRoute<dynamic>(
-          builder: (_) => UpdateGameView(game: game, group: group), //pages other than main pages
+          builder: (_) => UpdateGameScoreView(game: game, event: event), //pages other than main pages
           settings: settings,
           fullscreenDialog: true,
         );

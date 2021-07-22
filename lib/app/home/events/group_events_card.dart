@@ -54,7 +54,7 @@ class _GroupEventsCardState extends State<GroupEventsCard> {
                 ),
               ),
             ),
-            EventListWidget(group: widget.group.name),
+            EventListWidget(group: widget.group.name, admin: widget.admin),
           ],
         ),
       ),

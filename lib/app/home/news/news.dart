@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/news/widgets/news_vertical_scroll_widget.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,6 +26,8 @@ class News extends ConsumerWidget {
     final userAsyncValue = watch(userStreamProvider);
     return userAsyncValue.when(
       data: (user) {
+        print('user');
+        print(user.groupsFollowing);
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
@@ -62,7 +65,7 @@ class News extends ConsumerWidget {
                       child: Row(
                         children: [
                               () {
-                            if(user.admin == 'true') {
+                            if(user.admin == 'Admin' || user.admin == 'Student Admin') {
                               return InkWell(
                                 onTap: () {
                                   Navigator.of(context, rootNavigator: true).pushNamed(
@@ -110,7 +113,7 @@ class News extends ConsumerWidget {
                 SliverList(
                   delegate: SliverChildListDelegate.fixed(
                     [
-                      NewsView(admin: user.admin),
+                      NewsView(user: user),
                     ],
                   ),
                 ),
@@ -131,9 +134,9 @@ class News extends ConsumerWidget {
 }
 
 class NewsView extends StatefulWidget {
-  const NewsView({required this.admin});
+  const NewsView({required this.user});
 
-  final String admin;
+  final PTUser user;
 
   @override
   _NewsViewState createState() => _NewsViewState();
@@ -168,7 +171,7 @@ class _NewsViewState extends State<NewsView> {
                     pressElevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                     label: Text(
-                      index == 0 ? 'All' : NewsCategories.categories[index-1],
+                      index == 0 ? 'Following' : NewsCategories.categories[index-1],
                     ),
                     selectedColor: Colors.red[100],
                     labelStyle: TextStyle(
@@ -185,10 +188,10 @@ class _NewsViewState extends State<NewsView> {
                           offset = 0;
                         }
                         else if(_selectedCategoryIndex == 3) {
-                          offset = 100;
+                          offset = 150;
                         }
                         else if(_selectedCategoryIndex == 4) {
-                          offset = 120;
+                          offset = 175;
                         }
                         _controller.animateTo(offset, duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
                       });
@@ -206,8 +209,8 @@ class _NewsViewState extends State<NewsView> {
         ),
         Column(
           children: [
-            // const SizedBox(height: 5),
-            _selectedCategoryIndex == 0 ? NewsVerticalScrollWidget(admin: widget.admin) : NewsVerticalScrollWidget(admin: widget.admin, category: NewsCategories.categories[_selectedCategoryIndex-1]),
+            const SizedBox(height: 5),
+            _selectedCategoryIndex == 0 ? NewsVerticalScrollWidget(admin: widget.user.admin, groupsFollowing: widget.user.groupsFollowing,) : NewsVerticalScrollWidget(groupsFollowing: widget.user.groupsFollowing, admin: widget.user.admin, category: NewsCategories.categories[_selectedCategoryIndex-1]),
             const SizedBox(height: 20),
           ],
         ),

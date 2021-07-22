@@ -28,6 +28,7 @@ class _CreateGameViewState extends State<CreateGameView> {
     // TODO: implement initState
     super.initState();
     _group = widget.group.name;
+    _groupImageURL = widget.group.logoURL;
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -37,6 +38,9 @@ class _CreateGameViewState extends State<CreateGameView> {
   String? _opponentName;
   String? _opponentLogoURL;
   String? _group;
+  String? _groupImageURL;
+  String? _description;
+  String? _location;
   String? _date = DateTime.now().toString();
 
   bool _validateAndSaveForm() {
@@ -69,7 +73,19 @@ class _CreateGameViewState extends State<CreateGameView> {
           date: _date!,
           gameDone: 'false',
         );
+        final event = Event(
+          id: id,
+          title: 'Park Tudor v.s. $_opponentName',
+          description: _description ?? '',
+          location: _location ?? '',
+          date: _date!,
+          gameID: id,
+          group: _group!,
+          groupImageURL: _groupImageURL!,
+          imageURL: '',
+        );
         await database.setGame(game);
+        await database.setEvent(event);
         await Future.delayed(const Duration(seconds: 1));
         Navigator.of(context).pop();
       } catch (e) {
@@ -151,6 +167,11 @@ class _CreateGameViewState extends State<CreateGameView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
+              // const Divider(
+              //   height: 0,
+              //   thickness: 0.5,
+              //   color: Colors.grey,
+              // ),
               DateTimeField(
                 validator: (value) =>
                 (value ?? '').toString().isNotEmpty
@@ -260,7 +281,7 @@ class _CreateGameViewState extends State<CreateGameView> {
                     }(),
                   ),
                   title: Text(
-                    _opponentName ?? 'Select',
+                    _opponentName ?? 'Select opponent',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
@@ -276,6 +297,103 @@ class _CreateGameViewState extends State<CreateGameView> {
                 height: 0,
                 thickness: 0.5,
                 color: Colors.grey,
+              ),
+              TextFormField(
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                    labelText: 'Location',
+                    labelStyle: TextStyle(
+                      color: Colors.grey,
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 0.5,
+                        )
+                    ),
+                    border: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 0.5,
+                        )
+                    ),
+                    disabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 0.5,
+                        )
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 0.5,
+                        )
+                    ),
+                  ),
+                  keyboardAppearance: Brightness.light,
+                  initialValue: _location,
+                  validator: (value) =>
+                  (value ?? '').isNotEmpty
+                      ? null
+                      : 'Event location can\'t be empty',
+                  onChanged: (value) {
+                    setState(() {
+                      _location = value;
+                    });
+                  }
+              ),
+              const SizedBox(height: 6),
+              TextFormField(
+                // autofocus: true,
+                autocorrect: true,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                  alignLabelWithHint: true,
+                  labelText: 'Additional Game Details',
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 0.5,
+                      )
+                  ),
+                  border: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 0.5,
+                      )
+                  ),
+                  disabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 0.5,
+                      )
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 0.5,
+                      )
+                  ),
+                ),
+                keyboardAppearance: Brightness.light,
+                //maxLines: 8,
+                minLines: 5,
+                maxLines: 30,
+                initialValue: _description,
+                validator: (value) =>
+                (value ?? '').isNotEmpty
+                    ? null
+                    : 'News body can\'t be empty',
+                onChanged: (value) {
+                  setState(() {
+                    _description = value;
+                  });
+                },
               ),
             ],
           ),

@@ -48,11 +48,11 @@ class FirestoreDatabase {
     return await ref.getDownloadURL();
   }
 
-  Future<String> uploadFile(File filePath) async {
+  Future<String> uploadFile(File filePath, String group) async {
     String returnURL = '';
     firebase_storage.Reference storageReference = firebase_storage.FirebaseStorage.instance
         .ref()
-        .child('articleImages/${basename(filePath.path)}');
+        .child('$group/${basename(filePath.path)}');
     try {
       await storageReference.putFile(filePath).then((value) => value.ref.getDownloadURL().then((value) => returnURL = value));
       print('File uploaded to storage.');

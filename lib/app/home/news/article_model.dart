@@ -5,7 +5,7 @@ import 'package:get_up_park/app/home/groups/group_model.dart';
 
 @immutable
 class Article extends Equatable {
-  const Article({required this.id, required this.title, required this.body, required this.category, required this.group, required this.groupLogoURL, required this.imageURL, required this.date, required this.gameID});
+  const Article({required this.id, required this.title, required this.body, required this.category, required this.group, required this.groupLogoURL, required this.imageURL, required this.date, required this.gameID, required this.gameDone});
   final String id;
   final String title;
   final String body;
@@ -15,9 +15,10 @@ class Article extends Equatable {
   final String imageURL;
   final String date;
   final String gameID;
+  final String gameDone;
 
   @override
-  List<Object> get props => [id, title, body, category, group, groupLogoURL, imageURL, date, gameID];
+  List<Object> get props => [id, title, body, category, group, groupLogoURL, imageURL, date, gameID, gameDone];
 
   @override
   bool get stringify => true;
@@ -66,7 +67,12 @@ class Article extends Equatable {
       throw StateError('missing gameID for article: $documentId');
     }
 
-    return Article(id: documentId, title: title, body: body, category: category, group: group, groupLogoURL: groupLogoURL, imageURL: imageURL, date: date, gameID: gameID);
+    final gameDone = data['gameDone'] as String?;
+    if (gameDone == null) {
+      throw StateError('missing gameDone for article: $documentId');
+    }
+
+    return Article(id: documentId, title: title, body: body, category: category, group: group, groupLogoURL: groupLogoURL, imageURL: imageURL, date: date, gameID: gameID, gameDone: gameDone);
   }
 
   Map<String, dynamic> toMap() {
@@ -79,6 +85,7 @@ class Article extends Equatable {
       'imageURL': imageURL,
       'date': date,
       'gameID': gameID,
+      'gameDone': gameDone,
     };
   }
 }

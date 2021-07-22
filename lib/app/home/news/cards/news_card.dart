@@ -31,16 +31,16 @@ class NewsCard extends StatelessWidget {
       },
       child: SizedBox(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), //6, 3
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(0), //6
+              borderRadius: BorderRadius.circular(15), //6
               boxShadow: [
                 BoxShadow(
-                  // color: Colors.black.withOpacity(0.15),
-                  // spreadRadius: 1,
-                  // blurRadius: 6,
-                  // offset: const Offset(0, 2),
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 0,
+                  blurRadius: 15,
+                  offset: const Offset(0, 3),
                   // color: Colors.black.withOpacity(0.2),
                   // spreadRadius: 0,
                   // blurRadius: 3,

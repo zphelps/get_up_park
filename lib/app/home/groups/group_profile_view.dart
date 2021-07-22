@@ -11,6 +11,7 @@ import 'package:get_up_park/app/home/sports/cards/recent_score_card.dart';
 import 'package:get_up_park/app/home/sports/cards/schedule_card.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
+import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:get_up_park/shared_widgets/loading.dart';
@@ -63,7 +64,7 @@ class GroupProfile extends ConsumerWidget {
                 ),
                 actions: [
                       () {
-                    if (user.admin == 'true') {
+                    if (user.admin == 'Admin') {
                       return Padding(
                         padding: const EdgeInsets.only(right: 16),
                         child: CircleAvatar(
@@ -128,26 +129,85 @@ class GroupProfile extends ConsumerWidget {
                   }(),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
-                  background: DecoratedBox(
-                    decoration: const BoxDecoration(),
-                    child: InkWell(
-                        onTap: () {
-                          Navigator.of(context, rootNavigator: true).pushNamed(
-                              AppRoutes.fullScreenImageView,
-                              arguments: {
-                                'imageURL': group.backgroundImageURL,
-                              }
-                          );
-                        },
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image(
-                              image: CachedNetworkImageProvider(group.backgroundImageURL, cacheKey: group.backgroundImageURL),
-                              fit: BoxFit.cover,
+                  collapseMode: CollapseMode.pin, // to make radius remain if scrolled
+                  // title: Text('Hola'),
+                  titlePadding: const EdgeInsets.all(30),
+                  centerTitle: true,
+                  stretchModes: [
+                    StretchMode.zoomBackground, // zoom effect
+                  ],
+                  background: Container(
+                    color: Colors.white,
+                    child: Stack(
+                      fit: StackFit.expand, // expand stack
+                      children: [
+                        ColorFiltered(
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.05),
+                            BlendMode.srcOver,
+                          ),
+                          child: Image(
+                            image: CachedNetworkImageProvider(group.backgroundImageURL, cacheKey: group.backgroundImageURL),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          child: Container(
+                            height: 82,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 0,
+                                )),
+                          ),
+                          bottom: -1,
+                          left: 0,
+                          right: 0,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 15,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              minVerticalPadding: 0,
+                              horizontalTitleGap: 10,
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image(
+                                  image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
+                                  fit: BoxFit.fitWidth,
+                                ),
+                              ),
+                              title: Text(
+                                group.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 22,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              subtitle: Text(
+                                group.category,
+                                style: TextStyle(
+                                  // color: Colors.grey[800],
+                                  color: NewsCategories.getCategoryColor(group.category, false),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                            Positioned(
-                                bottom: 20,
+                          ),
+                        ),
+                            () {
+                          if(user.admin == 'Admin') {
+                            return Positioned(
+                                bottom: 95,
                                 right: 20,
                                 child: InkWell(
                                   onTap: () {
@@ -171,51 +231,123 @@ class GroupProfile extends ConsumerWidget {
                                     ),
                                   ),
                                 )
-                            ),
-                          ],
-                        )
+                            );
+                          }
+                          return const SizedBox(height: 0);
+                        }()
+                        // Positioned(
+                        //   bottom: 0, // to bottom
+                        //   left: 35, // to right 45
+                        //   child: ClipRRect(
+                        //     borderRadius: BorderRadius.circular(50),
+                        //     child: Image(
+                        //       // color: Colors.white,
+                        //       height: 55,
+                        //       width: 55,
+                        //       image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
+                        //       fit: BoxFit.fitWidth,
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ),
                 ),
+                // flexibleSpace: FlexibleSpaceBar(
+                //   background: DecoratedBox(
+                //     decoration: const BoxDecoration(),
+                //     child: InkWell(
+                //         onTap: () {
+                //           Navigator.of(context, rootNavigator: true).pushNamed(
+                //               AppRoutes.fullScreenImageView,
+                //               arguments: {
+                //                 'imageURL': group.backgroundImageURL,
+                //               }
+                //           );
+                //         },
+                //         child: Stack(
+                //           fit: StackFit.expand,
+                //           children: [
+                //             Image(
+                //               image: CachedNetworkImageProvider(group.backgroundImageURL, cacheKey: group.backgroundImageURL),
+                //               fit: BoxFit.cover,
+                //             ),
+                //                 () {
+                //               if(user.admin == 'Admin') {
+                //                 return Positioned(
+                //                     bottom: 20,
+                //                     right: 20,
+                //                     child: InkWell(
+                //                       onTap: () {
+                //                         Navigator.of(context, rootNavigator: true).pushNamed(
+                //                             AppRoutes.updateGroupBackgroundImageView,
+                //                             arguments: {
+                //                               'group': group,
+                //                             }
+                //                         );
+                //                       },
+                //                       child: Container(
+                //                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                //                         child: const Icon(
+                //                           Icons.edit,
+                //                           color: Colors.black,
+                //                           size: 18,
+                //                         ),
+                //                         decoration: BoxDecoration(
+                //                           borderRadius: BorderRadius.circular(5),
+                //                           color: Colors.grey[200],
+                //                         ),
+                //                       ),
+                //                     )
+                //                 );
+                //               }
+                //               return const SizedBox(height: 0);
+                //             }()
+                //           ],
+                //         )
+                //     ),
+                //   ),
+                // ),
                 // Make the initial height of the SliverAppBar larger than normal.
-                expandedHeight: 225,
+                expandedHeight: 350,
               ),
               // Next, create a SliverList
               SliverList(
                   delegate: SliverChildListDelegate.fixed(
                       [
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            minVerticalPadding: 0,
-                            horizontalTitleGap: 10,
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: Image(
-                                image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ),
-                            title: Text(
-                              group.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 22,
-                                color: Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              group.category,
-                              style: TextStyle(
-                                color: Colors.grey[800],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+                        // const SizedBox(height: 10),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(left: 15),
+                        //   child: ListTile(
+                        //     contentPadding: EdgeInsets.zero,
+                        //     minVerticalPadding: 0,
+                        //     horizontalTitleGap: 10,
+                        //     leading: ClipRRect(
+                        //       borderRadius: BorderRadius.circular(50),
+                        //       child: Image(
+                        //         image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
+                        //         fit: BoxFit.fitWidth,
+                        //       ),
+                        //     ),
+                        //     title: Text(
+                        //       group.name,
+                        //       style: const TextStyle(
+                        //         fontWeight: FontWeight.w700,
+                        //         fontSize: 22,
+                        //         color: Colors.black,
+                        //       ),
+                        //     ),
+                        //     subtitle: Text(
+                        //       group.category,
+                        //       style: TextStyle(
+                        //         color: NewsCategories.getCategoryColor(group.category, false),
+                        //         // color: Colors.grey[800],
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 10),
                         InkWell(
                           onTap: () async {
                             HapticFeedback.heavyImpact();

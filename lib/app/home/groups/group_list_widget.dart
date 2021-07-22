@@ -63,17 +63,17 @@ class _LoadGroupsViewState extends State<LoadGroupsView> {
     widget.groupsAsyncValue.whenData((groups) async {
       if(allGroups.length != groups.length) {
         allGroups.clear();
-        // setState(() {
-        //   allGroups = groups;
-        // });
-        for (Group group in groups) {
-          print('Adding groups');
-          allGroups.add(group);
-          await precacheImage(CachedNetworkImageProvider(group.logoURL), context);
-          await precacheImage(CachedNetworkImageProvider(group.backgroundImageURL), context);
-        }
+        setState(() {
+          allGroups = groups;
+        });
+        // for (Group group in groups) {
+        //   print('Adding groups');
+        //   allGroups.add(group);
+        //   await precacheImage(CachedNetworkImageProvider(group.logoURL), context);
+        //   await precacheImage(CachedNetworkImageProvider(group.backgroundImageURL), context);
+        // }
 
-        Timer(const Duration(milliseconds: 0), () {
+        Timer(const Duration(milliseconds: 100), () {
           setState(() {
             loadingData = false;
           });

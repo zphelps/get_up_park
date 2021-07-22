@@ -4,7 +4,9 @@ import 'package:get_up_park/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class UpcomingEventsCard extends StatelessWidget {
-  const UpcomingEventsCard({Key? key}) : super(key: key);
+  const UpcomingEventsCard({required this.admin});
+
+  final String admin;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class UpcomingEventsCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          EventListWidget(itemCount: 5, date: DateTime.now().toString(),),
+          EventListWidget(itemCount: 5, date: DateTime.now().toString(), admin: admin),
         ],
       ),
       decoration: BoxDecoration(
