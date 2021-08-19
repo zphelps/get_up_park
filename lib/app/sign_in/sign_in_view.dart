@@ -1,8 +1,11 @@
 import 'package:alert_dialogs/alert_dialogs.dart';
 import 'package:flutter/material.dart';
+import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/auth.dart';
 import 'package:get_up_park/shared_widgets/loading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class SignInView extends StatefulWidget with ChangeNotifier {
   SignInView({Key? key}) : super(key: key);
@@ -54,7 +57,7 @@ class _SignInViewState extends State<SignInView> {
                 child: Column(
                   children: <Widget>[
                     Image (
-                      image: const AssetImage('assets/pantherHead.png'),
+                      image: const AssetImage('assets/pantherLaunch.png'),
                       height: MediaQuery.of(context).size.height * 0.175,
                       width: MediaQuery.of(context).size.width * 0.45,
                     ),
@@ -110,9 +113,12 @@ class _SignInViewState extends State<SignInView> {
                       else {
                         return SizedBox(
                           width: MediaQuery.of(context).size.width * 0.8,
-                          height: 40,
-                          child: RaisedButton(
-                            color: Colors.red[600],
+                          height: 50,
+                          child: RawMaterialButton(
+                            // padding: const EdgeInsets.symmetric(vertical:0),
+                            fillColor: Colors.red,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            // color: Colors.red,
                             child: const Text(
                               'Sign In',
                               style: TextStyle(
@@ -138,9 +144,16 @@ class _SignInViewState extends State<SignInView> {
                                   });
                                 }
                                 else {
+                                  final firebaseAuth = context.read(firebaseAuthProvider);
                                   setState(() {
                                     _loading = false;
                                   });
+                                  // if(!firebaseAuth.currentUser!.emailVerified && firebaseAuth.currentUser!.metadata.creationTime!.isAfter(DateTime(2021, 8, 17))) {
+                                  //   Navigator.of(context, rootNavigator: true).pushNamed(AppRoutes.verificationView);
+                                  // }
+                                  // else {
+                                  //   Navigator.of(context).pop();
+                                  // }
                                   Navigator.of(context).pop();
                                 }
                               }

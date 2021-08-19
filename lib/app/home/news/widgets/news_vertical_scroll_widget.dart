@@ -10,33 +10,18 @@ import 'package:get_up_park/app/home/news/cards/news_card.dart';
 import 'package:get_up_park/app/home/news/cards/post_card.dart';
 import 'package:get_up_park/app/home/news/cards/score_post_card.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/shared_widgets/loading.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
-
-
-final articleStreamProvider = StreamProvider.autoDispose<List<Article>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.articleStream();
-});
-
-final groupsStreamProvider = StreamProvider.autoDispose<List<Group>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.groupsStream();
-});
-
-final gamesStreamProvider = StreamProvider.autoDispose<List<Game>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.gamesStream();
-});
 
 // watch database
 class NewsVerticalScrollWidget extends ConsumerWidget {
 
-  const NewsVerticalScrollWidget({this.category = 'all', this.group = 'none', required this.admin, this.gameID = '', this.groupsFollowing = const []});
+  const NewsVerticalScrollWidget({this.category = 'all', this.group = 'none', required this.user, this.gameID = '', this.groupsFollowing = const []});
 
   final String category;
   final String group;
-  final String admin;
+  final PTUser user;
   final String gameID;
   final List<dynamic> groupsFollowing;
 
@@ -45,20 +30,20 @@ class NewsVerticalScrollWidget extends ConsumerWidget {
     final articleAsyncValue = watch(articleStreamProvider);
     final groupAsyncValue = watch(groupsStreamProvider);
     final gamesAsyncValue = watch(gamesStreamProvider);
-    return Container(color: Colors.white,child: SortNews(articleAsyncValue: articleAsyncValue, groupAsyncValue: groupAsyncValue, gamesAsyncValue: gamesAsyncValue, group: group, category: category, admin: admin, gameID: gameID, groupsFollowing: groupsFollowing,));
+    return Container(color: Colors.white,child: SortNews(articleAsyncValue: articleAsyncValue, groupAsyncValue: groupAsyncValue, gamesAsyncValue: gamesAsyncValue, group: group, category: category, user: user, gameID: gameID, groupsFollowing: groupsFollowing,));
   }
 
 }
 
 class SortNews extends StatefulWidget {
-  const SortNews({required this.articleAsyncValue, required this.groupAsyncValue, required this.gamesAsyncValue, required this.group, required this.category, required this.admin, required this.gameID, required this.groupsFollowing});
+  const SortNews({required this.articleAsyncValue, required this.groupAsyncValue, required this.gamesAsyncValue, required this.group, required this.category, required this.user, required this.gameID, required this.groupsFollowing});
 
   final AsyncValue<List<Article>> articleAsyncValue;
   final AsyncValue<List<Group>> groupAsyncValue;
   final AsyncValue<List<Game>> gamesAsyncValue;
   final String group;
   final String category;
-  final String admin;
+  final PTUser user;
   final String gameID;
   final List<dynamic> groupsFollowing;
 
@@ -94,9 +79,10 @@ class _SortNewsState extends State<SortNews> {
   Widget build(BuildContext context) {
     print('building');
     widget.articleAsyncValue.whenData((articles) async {
-      if((lastNews.length != articles.length && widget.category == 'all' && widget.group == 'none' && widget.gameID == '') || lastCategory != widget.category || widget.groupsFollowing.length != lastGroupsFollowing.length) {
+      if((lastNews != articles && widget.category == 'all' && widget.group == 'none' && widget.gameID == '') || lastCategory != widget.category || widget.groupsFollowing.length != lastGroupsFollowing.length) {
         filteredNews.clear();
         for (Article article in articles) {
+          print('in news loop');
           if(widget.groupsFollowing.isNotEmpty) {
             if(widget.groupsFollowing.contains(article.group)) {
               if(widget.gameID != '') {
@@ -142,7 +128,7 @@ class _SortNewsState extends State<SortNews> {
         lastNews = articles;
         lastGroupsFollowing = widget.groupsFollowing;
 
-        _timer = Timer(const Duration(milliseconds: 200),
+        _timer = Timer(const Duration(milliseconds: 300), //600
                 () {
               setState(() {
                 sortingData = false;
@@ -169,6 +155,14 @@ class _SortNewsState extends State<SortNews> {
       return const LoadingGroupsScroll();
     }
     else if(filteredNews.isEmpty) {
+      if(widget.gameID != '') {
+        return Column(
+          children: [
+            const SizedBox(height: 35,),
+            EmptyContent(title: 'No Game Updates Found', message: 'All news from this game will appear here.',center: true,),
+          ],
+        );
+      }
       return EmptyContent(title: 'No news found', message: 'Only news from groups you follow will appear in your feed.',center: true,);
     }
 
@@ -186,17 +180,17 @@ class _SortNewsState extends State<SortNews> {
               if(filteredNews[index].gameID != '') {
                 for(Game game in allGames) {
                   if(game.id == filteredNews[index].gameID && filteredNews[index].gameDone == 'true') {
-                    return ScorePostCard(article: filteredNews[index], admin: widget.admin, group: g, game: game);
+                    return ScorePostCard(article: filteredNews[index], user: widget.user, group: g, game: game);
                   }
                 }
               }
               if(filteredNews[index].imageURL.isEmpty && filteredNews[index].title.isEmpty) {
-                return PostCard(article: filteredNews[index], admin: widget.admin, group: g);
+                return PostCard(article: filteredNews[index], user: widget.user, group: g);
               }
               else if(filteredNews[index].title.isEmpty) {
-                return ImagePostCard(article: filteredNews[index], admin: widget.admin, group: g);
+                return ImagePostCard(article: filteredNews[index], user: widget.user, group: g);
               }
-              return NewsCard(article: filteredNews[index], admin: widget.admin);
+              return NewsCard(article: filteredNews[index], user: widget.user);
             }
           }
           return const SizedBox(width: 0);

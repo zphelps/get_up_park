@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
-import 'package:get_up_park/app/home/events/event_model.dart';
-import 'package:get_up_park/app/home/events/group_events_card.dart';
-import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/shared_widgets/loading.dart';
-import 'package:get_up_park/shared_widgets/vertical_list_builder.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
-
-final groupsStreamProvider = StreamProvider.autoDispose.family<List<Group>, List<dynamic>>((ref, groupsFollowing) {
-  final database = ref.watch(databaseProvider);
-  return database.groupsStream();
-});
 
 // watch database
 class EventsVerticalScrollWidget extends ConsumerWidget {
@@ -30,7 +21,7 @@ class EventsVerticalScrollWidget extends ConsumerWidget {
   }
 
   Widget _buildContents(BuildContext context, ScopedReader watch) {
-    final groupAsyncValue = watch(groupsStreamProvider(groupsFollowing));
+    final groupAsyncValue = watch(groupsStreamProvider);
     return groupAsyncValue.when(
       data: (items) {
         final filteredGroups = items.where((group) => groupsFollowing.contains(group.name)).toList();

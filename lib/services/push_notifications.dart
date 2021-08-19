@@ -5,6 +5,18 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/home/sports/opponent_model.dart';
 
+Future<void> sendCustomNotification(String title, String message) async {
+
+  await FirebaseFunctions.instance.httpsCallable(
+      'sendNotification',
+      options: HttpsCallableOptions(
+          timeout: const Duration(seconds: 15))).call({
+    "title": title,
+    "body": message,
+  });
+
+}
+
 Future<void> sendNotification(Article article, {String opponent = '', String opponentLogoURL = ''}) async {
 
   if(article.imageURL == '' && article.gameID == '') {

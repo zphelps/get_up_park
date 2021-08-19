@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_up_park/constants/keys.dart';
 import 'package:get_up_park/constants/strings.dart';
 
-enum TabItem { home, news, events, groups, sports }
+enum TabItem { home, news, events, groups }
 
 class TabItemData {
   const TabItemData(
@@ -38,10 +38,10 @@ class TabItemData {
     //   title: Strings.settings,
     //   icon: Icons.settings,
     // ),
-    TabItem.sports: TabItemData(
-      key: Keys.accountTab,
-      title: Strings.sports,
-      icon: Icons.sports,
-    ),
+    // TabItem.houseCup: TabItemData(
+    //   key: Keys.accountTab,
+    //   title: 'House Cup',
+    //   icon: Icons.emoji_events_outlined,
+    // ),
   };
 }

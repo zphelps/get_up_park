@@ -5,24 +5,10 @@ import 'package:get_up_park/app/announcements/announcement_model.dart';
 import 'package:get_up_park/app/announcements/announcement_tile.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/announcements/list_items_builder.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/strings.dart';
-
-
-final announcementsStreamProvider = StreamProvider.autoDispose<List<Announcement>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.announcementsStream();
-});
-
-final userStreamProvider =
-StreamProvider.autoDispose.family<PTUser, String>((ref, userID) {
-  print(userID);
-  final database = ref.watch(databaseProvider);
-  // return database.userStream(userID: userID);
-  return database.userStream();
-
-});
 
 // watch database
 class Announcements extends ConsumerWidget {
@@ -39,56 +25,48 @@ class Announcements extends ConsumerWidget {
   //   }
   // }
 
+  Announcements({required this.user});
+
+  final PTUser user;
+
   @override
   Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseAuth = context.read(firebaseAuthProvider);
-    final user = firebaseAuth.currentUser!;
-    final userAsyncValue = watch(userStreamProvider(user.uid));
-    return userAsyncValue.when(
-      data: (user) {
-        return Scaffold(
-          appBar: AppBar(
-            brightness: Brightness.light,
-            title: const Text(
-              Strings.announcements,
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600
-              ),
-            ),
-            backgroundColor: Colors.white,
-            elevation: 1,
-            iconTheme: const IconThemeData(
+    return Scaffold(
+      appBar: AppBar(
+        brightness: Brightness.light,
+        title: const Text(
+          Strings.announcements,
+          style: TextStyle(
               color: Colors.black,
-            ),
-            actions: <Widget>[
-                  () {
-                print(user.admin);
-                if(user.admin == 'true') {
-                  return IconButton(
-                    padding: const EdgeInsets.only(right: 18),
-                    icon: const Icon(Icons.add),
-                    onPressed: () => AddAnnouncement.show(context),
-                  );
-                }
-                return const SizedBox(width: 0);
-              }()
-              // IconButton(
-              //   icon: const Icon(Icons.add, color: Colors.white),
-              //   onPressed: () => EditJobPage.show(context),
-              // ),
-            ],
+              fontSize: 16,
+              fontWeight: FontWeight.w600
           ),
-          body: _buildContents(context, watch),
-        );
-      },
-      loading: () => Container(
-        color: Colors.transparent,
+        ),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
+        actions: <Widget>[
+              () {
+            print(user.admin);
+            if(user.admin == userTypes[0]) {
+              return IconButton(
+                padding: const EdgeInsets.only(right: 18),
+                icon: const Icon(Icons.add),
+                onPressed: () => AddAnnouncement.show(context),
+              );
+            }
+            return const SizedBox(width: 0);
+          }()
+          // IconButton(
+          //   icon: const Icon(Icons.add, color: Colors.white),
+          //   onPressed: () => EditJobPage.show(context),
+          // ),
+        ],
       ),
-      error: (_, __) => EmptyContent(),
+      body: _buildContents(context, watch),
     );
-    //print(user.uid);
   }
 
   Widget _buildContents(BuildContext context, ScopedReader watch) {

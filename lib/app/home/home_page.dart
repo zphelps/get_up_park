@@ -5,10 +5,8 @@ import 'package:get_up_park/app/home/events/events.dart';
 import 'package:get_up_park/app/home/groups/groups.dart';
 import 'package:get_up_park/app/home/home/home.dart';
 import 'package:get_up_park/app/home/news/news.dart';
-import 'package:get_up_park/app/home/settings/settings.dart';
-import 'package:get_up_park/app/home/sports/sports.dart';
 import 'package:get_up_park/app/home/tab_item.dart';
-import 'package:get_up_park/routing/app_router.dart';
+
 
 class HomePage extends StatefulWidget {
 
@@ -35,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       TabItem.news: (_) => News(),
       TabItem.events: (_) => Events(),
       TabItem.groups: (_) => Groups(),
-      // TabItem.sports: (_) => Sports(),
+      // TabItem.houseCup: (_) => HouseCup(),
     };
   }
 

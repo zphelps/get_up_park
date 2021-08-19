@@ -9,11 +9,6 @@ import 'package:get_up_park/app/home/sports/tiles/select_opponent_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 
-final opponentsStreamProvider = StreamProvider.autoDispose<List<Opponent>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.opponentsStream();
-});
-
 // watch database
 class SelectOpponentView extends ConsumerWidget {
 

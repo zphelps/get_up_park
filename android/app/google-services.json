@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "655836600388",
+    "firebase_url": "https://get-up-park-default-rtdb.firebaseio.com",
     "project_id": "get-up-park",
     "storage_bucket": "get-up-park.appspot.com"
   },
@@ -9,10 +10,18 @@
       "client_info": {
         "mobilesdk_app_id": "1:655836600388:android:ad6da8ec1f3d1502a90411",
         "android_client_info": {
-          "package_name": "com.zachphelps.get_up_park"
+          "package_name": "com.flutterflow.getuppark"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "655836600388-gu8r55v17t1vu5e5c097gj734ev8852c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flutterflow.getuppark",
+            "certificate_hash": "714559eae85f81c13bf4a7d84b42af963753d4ea"
+          }
+        },
         {
           "client_id": "655836600388-jn1gkf1lvpo4djdf7mt4ir5g5fmq6v22.apps.googleusercontent.com",
           "client_type": 3

@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
-import 'package:get_up_park/app/home/news/widgets/news_vertical_scroll_widget.dart';
 import 'package:get_up_park/app/home/sports/widgets/sports_vertical_scroll_widget.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/all_sports.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get_up_park/constants/news_categories.dart';
-
-final userStreamProvider =
-StreamProvider.autoDispose((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.userStream();
-});
 
 // watch database
 class Sports extends ConsumerWidget {
@@ -83,7 +76,7 @@ class Sports extends ConsumerWidget {
               ),
             ],
           ),
-          body: SportsView(admin: user.admin),
+          body: SportsView(user: user),
         );
       },
       loading: () =>
@@ -98,9 +91,9 @@ class Sports extends ConsumerWidget {
 }
 
 class SportsView extends StatefulWidget {
-  const SportsView({required this.admin});
+  const SportsView({required this.user});
 
-  final String admin;
+  final PTUser user;
 
   @override
   _SportsViewState createState() => _SportsViewState();
@@ -185,7 +178,7 @@ class _SportsViewState extends State<SportsView> {
               children: [
                 const SizedBox(height: 9),
                 // _selectedCategoryIndex == 0 ? GroupListWidget(selectGroup: widget.selectCategory) : GroupListWidget(category: NewsCategories.categories[_selectedCategoryIndex-1], selectGroup: widget.selectCategory),
-                _selectedCategoryIndex == 0 ? SportsVerticalScrollWidget(admin: widget.admin) : SportsVerticalScrollWidget(admin: widget.admin, sport: AllSports.list[_selectedCategoryIndex-1]),
+                _selectedCategoryIndex == 0 ? SportsVerticalScrollWidget(user: widget.user) : SportsVerticalScrollWidget(user: widget.user, sport: AllSports.list[_selectedCategoryIndex-1]),
                 const SizedBox(height: 50),
               ],
             ),

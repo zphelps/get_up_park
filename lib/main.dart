@@ -2,6 +2,8 @@
 import 'dart:math';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,12 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/auth_widget.dart';
+import 'package:get_up_park/app/home/groups/groups.dart';
 import 'package:get_up_park/app/home/home_page.dart';
 import 'package:get_up_park/app/onboarding/onboarding_page.dart';
 import 'package:get_up_park/app/onboarding/onboarding_view_modal.dart';
-import 'package:get_up_park/app/sign_in/sign_in_page.dart';
+import 'package:get_up_park/app/sign_in/auth_options_view.dart';
+import 'package:get_up_park/app/sign_in/email_verification_view.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/cover_screen/app_cover_screen.dart';
+import 'package:get_up_park/cover_screen/cover_screen_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
+import 'package:get_up_park/services/firebase_analytics.dart';
 import 'package:get_up_park/services/push_notifications.dart';
 import 'package:get_up_park/services/shared_preferences_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,7 +74,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await analytics.logAppOpen();
   final sharedPreferences = await SharedPreferences.getInstance();
+
   // PushNotificationsManager().init();
   // await Future.delayed(const Duration(seconds: 15));
 
@@ -126,7 +135,12 @@ class MyApp extends StatelessWidget {
     ));
     final firebaseAuth = context.read(firebaseAuthProvider);
 
+    final FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+
     return MaterialApp(
+      navigatorObservers: <NavigatorObserver>[
+        observer
+      ],
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
@@ -135,7 +149,7 @@ class MyApp extends StatelessWidget {
         nonSignedInBuilder: (_) =>
             Consumer(
               builder: (context, watch, _) {
-                return SignInPage();
+                return const AuthOptionsView();
                 // final didCompleteOnboarding =
                 // watch(onboardingViewModelProvider);
                 // return didCompleteOnboarding
@@ -144,6 +158,7 @@ class MyApp extends StatelessWidget {
               },
             ),
         signedInBuilder: (_) => HomePage(),
+        // nonVerifiedBuilder: (_) => EmailVerificationView(),
       ),
       onGenerateRoute: (settings) =>
           AppRouter.onGenerateRoute(settings, firebaseAuth),

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/events/event_list_widget.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class UpcomingEventsCard extends StatelessWidget {
-  const UpcomingEventsCard({required this.admin});
+  const UpcomingEventsCard({required this.user});
 
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class UpcomingEventsCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          EventListWidget(itemCount: 5, date: DateTime.now().toString(), admin: admin),
+          EventListWidget(itemCount: 5, date: DateTime.now().toString(), user: user),
         ],
       ),
       decoration: BoxDecoration(

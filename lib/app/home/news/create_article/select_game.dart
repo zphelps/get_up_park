@@ -7,6 +7,7 @@ import 'package:get_up_park/app/home/news/create_article/select_group_tile.dart'
 import 'package:get_up_park/app/home/sports/sports.dart';
 import 'package:get_up_park/app/home/sports/widgets/sports_vertical_scroll_widget.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 
 class SelectGame extends StatelessWidget {
   const SelectGame({required this.selectedGroup});
@@ -33,7 +34,11 @@ class SelectGame extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      body: SingleChildScrollView(child: SportsVerticalScrollWidget(admin: 'false', selectGame: true, selectedGroup: selectedGroup)),
+      body: SingleChildScrollView(child: SportsVerticalScrollWidget(
+          user: PTUser(email: '', admin: '', id: '', groupsFollowing: [], firstName: '', datesTriviaCompleted: [], lastName: '', advisor: '', groupsUserCanAccess: []),
+          selectGame: true,
+          selectedGroup: selectedGroup)
+      ),
     );
   }
 }

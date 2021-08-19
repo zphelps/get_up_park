@@ -28,7 +28,7 @@ class CalendarEventListTile extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.7,
+                width: MediaQuery.of(context).size.width * 0.68,
                 child: Text(
                   event.title,
                   style: GoogleFonts.inter(

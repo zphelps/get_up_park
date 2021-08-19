@@ -26,8 +26,15 @@
 	<string>NO</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Your camera will be used to add images to news articles. </string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Your microphone will be used when streaming</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your photo library will be used to add images to news articles.</string>
 	<key>UIBackgroundModes</key>
@@ -54,5 +61,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
 </dict>
 </plist>

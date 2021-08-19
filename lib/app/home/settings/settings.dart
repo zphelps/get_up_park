@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/settings/user_profile_icon.dart';
-import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
@@ -33,6 +31,27 @@ class Settings extends StatelessWidget {
             fontSize: 17,
           ),
         ),
+        actions: [
+          IconButton(
+            padding: const EdgeInsets.only(right: 10),
+            onPressed: () async {
+              HapticFeedback.heavyImpact();
+              String url = 'https://forms.gle/z1T5Acast9kuCtdr9';
+              if (await canLaunch(url)) {
+                await launch(url);
+              }
+              else {
+                // can't launch url, there is some error
+                print('eror');
+                throw "Could not launch $url";
+              }
+            },
+            icon: Icon(
+              Icons.edit_outlined,
+              size: 20,
+            ),
+          ),
+        ],
         backgroundColor: Colors.white,
         elevation: 1,
       ),
@@ -107,8 +126,82 @@ class Settings extends StatelessWidget {
           ),
           const Divider(height: 0),
           ListTile(
+            dense: true,
+            visualDensity: const VisualDensity(vertical: 1),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            horizontalTitleGap: 2,
+            minVerticalPadding: 0,
+            leading: const Icon(
+              Icons.school_outlined,
+              color: Colors.black,
+            ),
+            title: Text(
+              '${user.advisor}',
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            // trailing: const Icon(
+            //   Icons.launch,
+            //   size: 20,
+            // ),
+          ),
+          const Divider(height: 0),
+
+          const SizedBox(height: 25),
+          Padding(
+            padding: const EdgeInsets.only(left: 15),
+            child: Text(
+              'GENERAL',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          // ListTile(
+          //   onTap: () async {
+          //     HapticFeedback.heavyImpact();
+          //     String url = 'https://www.parktudor.org';
+          //     if (await canLaunch(url)) {
+          //       await launch(url);
+          //     }
+          //     else {
+          //       // can't launch url, there is some error
+          //       print('eror');
+          //       throw "Could not launch $url";
+          //     }
+          //   },
+          //   dense: true,
+          //   visualDensity: const VisualDensity(vertical: 1),
+          //   contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          //   horizontalTitleGap: 2,
+          //   minVerticalPadding: 0,
+          //   leading: const Icon(
+          //     Icons.info_outline,
+          //     color: Colors.black,
+          //   ),
+          //   title: const Text(
+          //     'About',
+          //     style: TextStyle(
+          //       color: Colors.black,
+          //       fontWeight: FontWeight.w600,
+          //       fontSize: 16,
+          //     ),
+          //   ),
+          //   trailing: const Icon(
+          //     Icons.launch,
+          //     size: 20,
+          //   ),
+          // ),
+          // const Divider(height: 0),
+          ListTile(
             onTap: () async {
-              if(user.admin == 'Admin') {
+              if(user.admin == userTypes[0]) {
                 Navigator.of(context, rootNavigator: true).pushNamed(
                     AppRoutes.userListView,
                     arguments: {
@@ -139,7 +232,7 @@ class Settings extends StatelessWidget {
               color: Colors.black,
             ),
             title: Text(
-              user.admin,
+              user.admin == userTypes[3] ? 'Request admin access' : user.admin,
               style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -147,84 +240,8 @@ class Settings extends StatelessWidget {
               ),
             ),
             trailing: Icon(
-              user.admin == 'Admin' ? Icons.chevron_right : Icons.launch,
+              user.admin == userTypes[0] ? Icons.chevron_right : Icons.launch,
               size: 22,
-            ),
-          ),
-          const Divider(height: 0),
-
-          const SizedBox(height: 25),
-          Padding(
-            padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              'GENERAL',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          ),
-          const SizedBox(height: 2),
-          // ListTile(
-          //   onTap: () {
-          //
-          //   },
-          //   dense: true,
-          //   visualDensity: const VisualDensity(vertical: 1),
-          //   contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-          //   horizontalTitleGap: 2,
-          //   minVerticalPadding: 0,
-          //   leading: const Icon(
-          //     Icons.group_outlined,
-          //     color: Colors.black,
-          //   ),
-          //   title: const Text(
-          //     'Groups Following',
-          //     style: TextStyle(
-          //       color: Colors.black,
-          //       fontWeight: FontWeight.w600,
-          //       fontSize: 16,
-          //     ),
-          //   ),
-          //   trailing: const Icon(
-          //     Icons.chevron_right,
-          //   ),
-          // ),
-          // const Divider(height: 0),
-          ListTile(
-            onTap: () async {
-              HapticFeedback.heavyImpact();
-              String url = 'https://www.parktudor.org';
-              if (await canLaunch(url)) {
-                await launch(url);
-              }
-              else {
-                // can't launch url, there is some error
-                print('eror');
-                throw "Could not launch $url";
-              }
-            },
-            dense: true,
-            visualDensity: const VisualDensity(vertical: 1),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-            horizontalTitleGap: 2,
-            minVerticalPadding: 0,
-            leading: const Icon(
-              Icons.info_outline,
-              color: Colors.black,
-            ),
-            title: const Text(
-              'About',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-            trailing: const Icon(
-              Icons.launch,
-              size: 20,
             ),
           ),
           const Divider(height: 0),
@@ -251,7 +268,7 @@ class Settings extends StatelessWidget {
               color: Colors.black,
             ),
             title: const Text(
-              'Help',
+              'Send feedback',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
@@ -267,7 +284,8 @@ class Settings extends StatelessWidget {
           ListTile(
             onTap: () async {
               await _auth.signOut();
-              Navigator.of(context).pop();
+              Navigator.of(context, rootNavigator: true).popUntil((route) => !route.hasActiveRouteBelow);
+              // Navigator.of(context).pushReplacementNamed(AppRoutes.authOptions);
             },
             dense: true,
             visualDensity: const VisualDensity(vertical: 1),
@@ -294,7 +312,7 @@ class Settings extends StatelessWidget {
           const SizedBox(height: 15),
           Center(
             child: Text(
-              'Beta release 0.1.0. Created by Zach Phelps.',
+              'Version 1.1.6(1). Created by Zach Phelps.',
               style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],

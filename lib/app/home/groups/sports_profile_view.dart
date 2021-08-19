@@ -4,26 +4,17 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
-import 'package:get_up_park/app/home/events/group_events_card.dart';
+import 'package:get_up_park/app/home/events/event_list_widget.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/news/widgets/news_vertical_scroll_widget.dart';
-import 'package:get_up_park/app/home/sports/cards/recent_score_card.dart';
-import 'package:get_up_park/app/home/sports/cards/schedule_card.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
+import 'package:get_up_park/app/home/sports/widgets/game_schedule_list_widget.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
-import 'package:get_up_park/shared_widgets/loading.dart';
-import 'package:intl/intl.dart';
-
-final userStreamProvider =
-StreamProvider.autoDispose((ref) {
-  final database = ref.watch(databaseProvider);
-  // return database.userStream(userID: userID);
-  return database.userStream();
-
-});
+import 'package:google_fonts/google_fonts.dart';
 
 class SportsProfile extends ConsumerWidget {
   const SportsProfile({required this.group});
@@ -32,9 +23,16 @@ class SportsProfile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
+    Group grp = group;
     final userAsyncValue = watch(userStreamProvider);
+    final groupAsyncValue = watch(groupStreamProvider(group));
     return userAsyncValue.when(
       data: (user) {
+        groupAsyncValue.whenData((g) {
+          if(g != group) {
+            grp = g;
+          }
+        });
         return Scaffold(
           backgroundColor: Colors.white,
           body: CustomScrollView(
@@ -46,6 +44,7 @@ class SportsProfile extends ConsumerWidget {
                 pinned: true,
                 backgroundColor: Colors.white,
                 elevation: 1,
+                toolbarHeight: 50,
                 iconTheme: const IconThemeData(
                   color: Colors.black,
                 ),
@@ -64,7 +63,7 @@ class SportsProfile extends ConsumerWidget {
                 ),
                 actions: [
                       () {
-                    if (user.admin == 'Admin') {
+                    if (user.admin == userTypes[0]) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 16),
                         child: CircleAvatar(
@@ -105,7 +104,6 @@ class SportsProfile extends ConsumerWidget {
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   collapseMode: CollapseMode.pin, // to make radius remain if scrolled
-                  // title: Text('Hola'),
                   titlePadding: const EdgeInsets.all(30),
                   centerTitle: true,
                   stretchModes: [
@@ -122,7 +120,7 @@ class SportsProfile extends ConsumerWidget {
                             BlendMode.srcOver,
                           ),
                           child: Image(
-                            image: CachedNetworkImageProvider(group.backgroundImageURL, cacheKey: group.backgroundImageURL),
+                            image: CachedNetworkImageProvider(grp.backgroundImageURL, cacheKey: grp.backgroundImageURL),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -167,6 +165,7 @@ class SportsProfile extends ConsumerWidget {
                                   fontSize: 22,
                                   color: Colors.black,
                                 ),
+                                maxLines: 1,
                               ),
                               subtitle: Text(
                                 group.category,
@@ -180,7 +179,7 @@ class SportsProfile extends ConsumerWidget {
                           ),
                         ),
                             () {
-                          if(user.admin == 'Admin') {
+                          if(user.admin == userTypes[0]) {
                             return Positioned(
                                 bottom: 95,
                                 right: 20,
@@ -202,7 +201,7 @@ class SportsProfile extends ConsumerWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(5),
-                                      color: Colors.grey[200],
+                                      color: Colors.white,
                                     ),
                                   ),
                                 )
@@ -210,80 +209,10 @@ class SportsProfile extends ConsumerWidget {
                           }
                           return const SizedBox(height: 0);
                         }()
-                        // Positioned(
-                        //   bottom: 0, // to bottom
-                        //   left: 35, // to right 45
-                        //   child: ClipRRect(
-                        //     borderRadius: BorderRadius.circular(50),
-                        //     child: Image(
-                        //       // color: Colors.white,
-                        //       height: 55,
-                        //       width: 55,
-                        //       image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
-                        //       fit: BoxFit.fitWidth,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
                 ),
-                // flexibleSpace: FlexibleSpaceBar(
-                //   background: DecoratedBox(
-                //     decoration: const BoxDecoration(),
-                //     child: InkWell(
-                //         onTap: () {
-                //           Navigator.of(context, rootNavigator: true).pushNamed(
-                //               AppRoutes.fullScreenImageView,
-                //               arguments: {
-                //                 'imageURL': group.backgroundImageURL,
-                //               }
-                //           );
-                //         },
-                //         child: Stack(
-                //           fit: StackFit.expand,
-                //           children: [
-                //             Image(
-                //               image: CachedNetworkImageProvider(group.backgroundImageURL, cacheKey: group.backgroundImageURL),
-                //               fit: BoxFit.cover,
-                //             ),
-                //             () {
-                //               if(user.admin == 'Admin') {
-                //                 return Positioned(
-                //                     bottom: 20,
-                //                     right: 20,
-                //                     child: InkWell(
-                //                       onTap: () {
-                //                         Navigator.of(context, rootNavigator: true).pushNamed(
-                //                             AppRoutes.updateGroupBackgroundImageView,
-                //                             arguments: {
-                //                               'group': group,
-                //                             }
-                //                         );
-                //                       },
-                //                       child: Container(
-                //                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                //                         child: const Icon(
-                //                           Icons.edit,
-                //                           color: Colors.black,
-                //                           size: 18,
-                //                         ),
-                //                         decoration: BoxDecoration(
-                //                           borderRadius: BorderRadius.circular(5),
-                //                           color: Colors.grey[200],
-                //                         ),
-                //                       ),
-                //                     )
-                //                 );
-                //               }
-                //               return const SizedBox(height: 0);
-                //             }()
-                //           ],
-                //         )
-                //     ),
-                //   ),
-                // ),
-
                 // Make the initial height of the SliverAppBar larger than normal.
                 expandedHeight: 350, //250
               ),
@@ -291,65 +220,35 @@ class SportsProfile extends ConsumerWidget {
               SliverList(
                   delegate: SliverChildListDelegate.fixed(
                       [
-                        // const SizedBox(height: 10),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(left: 15),
-                        //   child: ListTile(
-                        //     contentPadding: EdgeInsets.zero,
-                        //     minVerticalPadding: 0,
-                        //     horizontalTitleGap: 10,
-                        //     leading: ClipRRect(
-                        //       borderRadius: BorderRadius.circular(50),
-                        //       child: Image(
-                        //         image: CachedNetworkImageProvider(group.logoURL, cacheKey: group.logoURL),
-                        //         fit: BoxFit.fitWidth,
-                        //       ),
-                        //     ),
-                        //     title: Text(
-                        //       group.name,
-                        //       style: const TextStyle(
-                        //         fontWeight: FontWeight.w700,
-                        //         fontSize: 22,
-                        //         color: Colors.black,
-                        //       ),
-                        //     ),
-                        //     subtitle: Text(
-                        //       group.category,
-                        //       style: TextStyle(
-                        //         // color: Colors.grey[800],
-                        //         color: NewsCategories.getCategoryColor(group.category, false),
-                        //         fontWeight: FontWeight.w600,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(height: 5),
                         InkWell(
                           onTap: () async {
-                            HapticFeedback.heavyImpact();
-                            final database = context.read<FirestoreDatabase>(databaseProvider);
-                            user.groupsFollowing.contains(group.name) ? await database.unfollowGroup(user.id, group.name) : await database.followGroup(user.id, group.name);
+                            if(!user.groupsUserCanAccess.contains(group.name) && user.admin != userTypes[0]) {
+                              HapticFeedback.heavyImpact();
+                              final database = context.read<FirestoreDatabase>(databaseProvider);
+                              user.groupsFollowing.contains(group.name) ? await database.unfollowGroup(user.id, group.name) : await database.followGroup(user.id, group.name);
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 35),
                             margin: const EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
-                              user.groupsFollowing.contains(group.name) ? 'Unfollow' : 'Follow',
+                              user.groupsUserCanAccess.contains(group.name) || user.admin == userTypes[0] ? 'Admin' : user.groupsFollowing.contains(group.name) ? 'Unfollow' : 'Follow',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: user.groupsFollowing.contains(group.name) ? Colors.black : Colors.white,
+                                color: user.groupsUserCanAccess.contains(group.name) || user.admin == userTypes[0] ? Colors.grey[400] : user.groupsFollowing.contains(group.name) ? Colors.black : Colors.white,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             decoration: BoxDecoration(
-                              color: user.groupsFollowing.contains(group.name) ? Colors.grey[200] : Colors.red,
+                              color: user.groupsUserCanAccess.contains(group.name) || user.admin == userTypes[0] ? Colors.grey[100] : user.groupsFollowing.contains(group.name) ? Colors.grey[200] : Colors.red,
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 15),
-                        const Divider(height: 0, thickness: 0.65,),
-                        SportsProfileView(admin: user.admin, group: group),
+                        const SizedBox(height: 5),
+                        // const Divider(height: 0, thickness: 0.65,),
+                        SportsProfileView(user: user, group: group),
                         const SizedBox(height: 50),
                       ]
                   )
@@ -366,9 +265,9 @@ class SportsProfile extends ConsumerWidget {
 
 
 class SportsProfileView extends StatefulWidget {
-  const SportsProfileView({required this.admin, required this.group});
+  const SportsProfileView({required this.user, required this.group});
 
-  final String admin;
+  final PTUser user;
   final Group group;
 
   @override
@@ -402,18 +301,20 @@ class _SportsProfileViewState extends State<SportsProfileView> {
                 selectorOptions.length,
                     (int index) {
                   return ChoiceChip(
-                    backgroundColor: const Color(0xffEEEDF0),//Color(0xffEBEDF0),//Colors.grey[300],
+                    backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75),//const Color(0xffEEEDF0),
                     pressElevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 13),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                     label: Text(
                       selectorOptions[index],
                     ),
                     selectedColor: Colors.red[100],
-                    labelStyle: TextStyle(
-                        fontWeight: FontWeight.w700,
+                    labelStyle: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600,
                         color: _selectedCategoryIndex == index ? Colors.red : Colors.black,
-                        fontSize: 15
+                        fontSize: 14
                     ),
+                    shape: StadiumBorder(side: BorderSide(color: Colors.grey.shade400, width: 0.125)),
                     selected: _selectedCategoryIndex == index,
                     onSelected: (bool selected) {
                       HapticFeedback.mediumImpact();
@@ -447,18 +348,135 @@ class _SportsProfileViewState extends State<SportsProfileView> {
             const SizedBox(height: 9),
             () {
               if(_selectedCategoryIndex == 0) {
-                return Column(
-                  children: [
-                    // RecentScoresCard(group: widget.group, admin: widget.admin),
-                    ScheduleCard(group: widget.group, admin: widget.admin),
-                  ],
+                // return Column(
+                //   children: [
+                //     // RecentScoresCard(group: widget.group, admin: widget.admin),
+                //     ScheduleCard(group: widget.group, admin: widget.admin),
+                //   ],
+                // );
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Text(
+                          'Upcoming Games',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(height: 0),
+                      GameScheduleListWidget(group: widget.group, groupName: widget.group.name, user: widget.user, selectGame: false),
+                      const Divider(height: 0),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Text(
+                          'Past Games',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(height: 0),
+                      GameScheduleListWidget(group: widget.group, groupName: widget.group.name, user: widget.user, selectGame: false, past: true),
+                    ],
+                  ),
                 );
               }
               if(_selectedCategoryIndex == 1) {
-                return NewsVerticalScrollWidget(admin: widget.admin, group: widget.group.name);
+                return NewsVerticalScrollWidget(user: widget.user, group: widget.group.name);
               }
               if(_selectedCategoryIndex == 2) {
-                return GroupEventsCard(group: widget.group, admin: widget.admin);
+                // return GroupEventsCard(group: widget.group, admin: widget.admin);
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Upcoming Events',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true).pushNamed(
+                                    AppRoutes.groupEventsView,
+                                    arguments: {
+                                      'group': widget.group,
+                                      'user': widget.user,
+                                      'past': false,
+                                    }
+                                );
+                              },
+                              child: Text(
+                                'view all',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 20),
+                      EventListWidget(group: widget.group.name, user: widget.user, itemCount: 6, emptyTitle: 'No upcoming events found.',),
+                      const Divider(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Past Events',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true).pushNamed(
+                                    AppRoutes.groupEventsView,
+                                    arguments: {
+                                      'group': widget.group,
+                                      'user': widget.user,
+                                      'past': true,
+                                    }
+                                );
+                              },
+                              child: Text(
+                                'view all',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 20),
+                      EventListWidget(group: widget.group.name, user: widget.user, itemCount: 15, past: true, emptyTitle: 'No past events found.',),
+                    ],
+                  ),
+                );
               }
               return const SizedBox(height: 0);
             }(),

@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,7 +19,7 @@ class CovidCard extends StatelessWidget {
         }
         else {
           // can't launch url, there is some error
-          print('eror');
+          print('error');
           throw "Could not launch $url";
         }
       },
@@ -28,17 +27,17 @@ class CovidCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
-            Container(
-              height: 13,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.red, Colors.orange]
-                ),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              ),
-            ),
+            // Container(
+            //   height: 13,
+            //   decoration: const BoxDecoration(
+            //     gradient: LinearGradient(
+            //       colors: [Colors.red, Colors.orange]
+            //     ),
+            //     borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+            //   ),
+            // ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Row(
                 children: [
                   const Image(
@@ -60,7 +59,7 @@ class CovidCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.65,
+                        width: MediaQuery.of(context).size.width * 0.635,
                         child: const AutoSizeText(
                           'Please complete this form everyday before you arrive at school.',
                           maxLines: 2,
@@ -70,20 +69,29 @@ class CovidCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  // Icon(
+                  //   Icons.chevron_right,
+                  //   color: Colors.grey[600],
+                  //   size: 22,
+                  // ),
                 ],
               ),
             ),
           ],
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.25),
-              spreadRadius: 2,
-              blurRadius: 24,
-              offset: const Offset(0, 2),
+              // color: Colors.grey.withOpacity(0.25),
+              // spreadRadius: 2,
+              // blurRadius: 24,
+              // offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.175), //0.35
+              spreadRadius: 0,
+              blurRadius: 30,
+              offset: const Offset(0, 4),
             )
           ]
         ),

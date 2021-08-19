@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/events/calendar_event_list_tile.dart';
 import 'package:get_up_park/app/home/events/event_model.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -19,15 +20,15 @@ List<DateTime> daysInRange(DateTime first, DateTime last) {
 }
 
 final kNow = DateTime.now();
-final kFirstDay = DateTime(kNow.year, kNow.month - 3, kNow.day);
-final kLastDay = DateTime(kNow.year, kNow.month + 3, kNow.day);
+final kFirstDay = DateTime(kNow.year, kNow.month - 5, kNow.day);
+final kLastDay = DateTime(kNow.year, kNow.month + 5, kNow.day);
 
 class CalendarView extends StatefulWidget {
 
-  CalendarView({required this.events, required this.admin});
+  CalendarView({required this.events, required this.user});
 
   final List<dynamic> events;
-  final String admin;
+  final PTUser user;
 
   @override
   _CalendarViewState createState() => _CalendarViewState();
@@ -121,6 +122,12 @@ class _CalendarViewState extends State<CalendarView> {
     final PageController controller = PageController(initialPage: lastPageIndex);
     return Column(
       children: [
+        const SizedBox(height: 5),
+        const Divider(
+          height: 0,
+          thickness: 0.175,
+          color: Colors.grey,
+        ),
         TableCalendar<Event>(
           availableCalendarFormats: {
             CalendarFormat.month: 'month',
@@ -134,7 +141,7 @@ class _CalendarViewState extends State<CalendarView> {
             titleTextStyle: TextStyle(
               color: Colors.black,
               fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
           firstDay: kFirstDay,
@@ -161,7 +168,7 @@ class _CalendarViewState extends State<CalendarView> {
             defaultTextStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.w700,
-              fontSize: 15,
+              fontSize: 16,
             ),
             selectedTextStyle: TextStyle(
               color: _selectedDay!.day == DateTime.now().day ? Colors.white : Colors.red,
@@ -178,11 +185,11 @@ class _CalendarViewState extends State<CalendarView> {
               color: Colors.red,
             ),
             // Use `CalendarStyle` to customize the UI
-            markersMaxCount: 2,
+            markersMaxCount: 3,
             markerSize: 4,
             markerDecoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle
+                color: Colors.red,
+                shape: BoxShape.circle
             ),
             markersAnchor: 2.35,
             markerMargin: const EdgeInsets.symmetric(horizontal: 1),
@@ -208,169 +215,69 @@ class _CalendarViewState extends State<CalendarView> {
           thickness: 1,
           height: 0,
         ),
-        // Expanded(
-        //   child: PageView.builder(
-        //     controller: controller,
-        //     itemCount: daysInRange(kFirstDay, kLastDay).length,
-        //     scrollDirection: Axis.horizontal,
-        //     onPageChanged: (index) {
-        //       // print(index);
-        //       // print(lastPageIndex);
-        //       if(lastPageIndex > index) {
-        //         setState(() {
-        //           _onDaySelected(_selectedDay!.subtract(const Duration(days: 1)), _focusedDay);
-        //           // _selectedDay = _selectedDay!.add(const Duration(days: 1));
-        //           lastPageIndex = index;
-        //         });
-        //       }
-        //       else {
-        //         setState(() {
-        //           _onDaySelected(_selectedDay!.add(const Duration(days: 1)), _focusedDay);
-        //           lastPageIndex = index;
-        //         });
-        //       }
-        //
-        //     },
-        //     itemBuilder: (context, index) {
-        //       return _selectedEvents!.isEmpty ?
-        //       EmptyContent(title: 'No events on this date', message: 'Only groups you are following will appear in the calender', center: false)
-        //           : ListView.separated(
-        //         itemCount: _selectedEvents!.length,
-        //         separatorBuilder: (context, index){
-        //           return const Divider(height: 0, thickness: 0.5,);
-        //         },
-        //         itemBuilder: (context, index) {
-        //           return InkWell(
-        //             onTap: () {
-        //               if(_selectedEvents![index].gameID != '') {
-        //                 Navigator.of(context, rootNavigator: true).pushNamed(
-        //                     AppRoutes.gameView,
-        //                     arguments: {
-        //                       'admin': widget.admin,
-        //                       'gameID': _selectedEvents![index].gameID,
-        //                     }
-        //                 );
-        //               }
-        //               else {
-        //                 Navigator.of(context, rootNavigator: true).pushNamed(
-        //                     AppRoutes.eventView,
-        //                     arguments: {
-        //                       'event': _selectedEvents![index],
-        //                     }
-        //                 );
-        //               }
-        //             },
-        //             child: Container(
-        //               padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
-        //               // margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-        //               child: Row(
-        //                 children: [
-        //                   ClipRRect(
-        //                     borderRadius: BorderRadius.circular(30),
-        //                     child: CachedNetworkImage(
-        //                       memCacheHeight: 1000,
-        //                       memCacheWidth: 1000,
-        //                       fadeInDuration: Duration.zero,
-        //                       placeholderFadeInDuration: Duration.zero,
-        //                       fadeOutDuration: Duration.zero,
-        //                       imageUrl: _selectedEvents![index].groupImageURL,
-        //                       fit: BoxFit.fitWidth,
-        //                       width: 45,
-        //                       height: 45,
-        //                       placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
-        //                     ),
-        //                   ),
-        //                   Flexible(child: CalendarEventListTile(event: _selectedEvents![index])),
-        //                 ],
-        //               ),
-        //             ),
-        //           );
-        //         },
-        //       );
-        //     },
-        //   ),
-        // )
         Expanded(
           child: ValueListenableBuilder<List<Event>>(
             valueListenable: _selectedEvents,
             builder: (context, value, _) {
-              return PageView.builder(
-                controller: controller,
-                itemCount: daysInRange(kFirstDay, kLastDay).length,
-                scrollDirection: Axis.horizontal,
-                onPageChanged: (index) {
-                  // print(index);
-                  // print(lastPageIndex);
-                  if(lastPageIndex > index) {
-                    setState(() {
-                      _onDaySelected(_selectedDay!.subtract(const Duration(days: 1)), _focusedDay);
-                      // _selectedDay = _selectedDay!.add(const Duration(days: 1));
-                      lastPageIndex = index;
-                    });
-                  }
-                  else {
-                    setState(() {
-                      _onDaySelected(_selectedDay!.add(const Duration(days: 1)), _focusedDay);
-                      lastPageIndex = index;
-                    });
-                  }
-
+              return _selectedEvents.value.isEmpty ? EmptyContent(title: 'No Events Found', message: 'Only events from groups you follow will appear here.',)
+              : ListView.separated(
+                itemCount: value.length,
+                separatorBuilder: (context, index){
+                  return const Divider(height: 0, thickness: 0.5,);
                 },
                 itemBuilder: (context, index) {
-                  return _selectedEvents.value.isEmpty ?
-                       EmptyContent(title: 'No events on this date', message: 'Only groups you are following will appear in the calender', center: false)
-                  : ListView.separated(
-                    itemCount: value.length,
-                    separatorBuilder: (context, index){
-                      return const Divider(height: 0, thickness: 0.5,);
+                  return InkWell(
+                    onTap: () async {
+                      if(_selectedEvents.value[index].gameID != '') {
+                        await Navigator.of(context, rootNavigator: true).pushNamed(
+                            AppRoutes.gameView,
+                            arguments: {
+                              'user': widget.user,
+                              'gameID': _selectedEvents.value[index].gameID,
+                            }
+                        );
+                        _onDaySelected(_selectedDay!, _focusedDay);
+                        setState(() {
+                          _selectedEvents.value = _getEventsForDay(_selectedDay!);
+                        });
+                      }
+                      else {
+                        await Navigator.of(context, rootNavigator: true).pushNamed(
+                            AppRoutes.eventView,
+                            arguments: {
+                              'event': _selectedEvents.value[index],
+                            }
+                        );
+                        _onDaySelected(_selectedDay!, _focusedDay);
+                        setState(() {
+                          _selectedEvents.value = _getEventsForDay(_selectedDay!);
+                        });
+                      }
                     },
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          if(_selectedEvents.value[index].gameID != '') {
-                            Navigator.of(context, rootNavigator: true).pushNamed(
-                                AppRoutes.gameView,
-                                arguments: {
-                                  'admin': widget.admin,
-                                  'gameID': _selectedEvents.value[index].gameID,
-                                }
-                            );
-                          }
-                          else {
-                            Navigator.of(context, rootNavigator: true).pushNamed(
-                                AppRoutes.eventView,
-                                arguments: {
-                                  'event': _selectedEvents.value[index],
-                                }
-                            );
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
-                          // margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: CachedNetworkImage(
-                                  memCacheHeight: 1000,
-                                  memCacheWidth: 1000,
-                                  fadeInDuration: Duration.zero,
-                                  placeholderFadeInDuration: Duration.zero,
-                                  fadeOutDuration: Duration.zero,
-                                  imageUrl: _selectedEvents.value[index].groupImageURL,
-                                  fit: BoxFit.fitWidth,
-                                  width: 45,
-                                  height: 45,
-                                  placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
-                                ),
-                              ),
-                              Flexible(child: CalendarEventListTile(event: _selectedEvents.value[index])),
-                            ],
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
+                      // margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: CachedNetworkImage(
+                              memCacheHeight: 1000,
+                              memCacheWidth: 1000,
+                              fadeInDuration: Duration.zero,
+                              placeholderFadeInDuration: Duration.zero,
+                              fadeOutDuration: Duration.zero,
+                              imageUrl: _selectedEvents.value[index].groupImageURL,
+                              fit: BoxFit.fitWidth,
+                              width: 45,
+                              height: 45,
+                              placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                          Flexible(child: CalendarEventListTile(event: _selectedEvents.value[index])),
+                        ],
+                      ),
+                    ),
                   );
                 },
               );

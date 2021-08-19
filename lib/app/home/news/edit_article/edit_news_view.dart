@@ -33,6 +33,7 @@ class _EditNewsViewState extends State<EditNewsView> {
     _category = widget.article.category;
     _groupLogoURL = widget.article.groupLogoURL;
     _gameID = widget.article.gameID;
+    _imageURL = widget.article.imageURL;
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -68,6 +69,7 @@ class _EditNewsViewState extends State<EditNewsView> {
   String? _sport;
   String? _opponentName;
   String? _opponentLogoURL;
+  String? _imageURL;
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
@@ -97,15 +99,18 @@ class _EditNewsViewState extends State<EditNewsView> {
           _loading = true;
         });
         final database = context.read<FirestoreDatabase>(databaseProvider);
-        String? _imageURL;
+        String? imageURL;
         if(_image!=null) {
-          _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
+          imageURL = await database.uploadFile(_image!, _group ?? 'misc');
+        }
+        else {
+          imageURL =  _imageURL;
         }
         final article = Article(
           id: widget.article.id,
           title: _title ?? '',
           body: _body!,
-          imageURL: _imageURL ?? '',
+          imageURL: imageURL ?? '',
           category: _category!,
           group: _group!,
           groupLogoURL: _groupLogoURL!,
@@ -453,7 +458,7 @@ class _EditNewsViewState extends State<EditNewsView> {
               }
             }(),
               () {
-                if(_image == null) {
+                if(_image == null && _imageURL == '') {
                   return ListTile(
                     onTap: () {
                       getImageFromPicker();
@@ -477,15 +482,29 @@ class _EditNewsViewState extends State<EditNewsView> {
                     ),
                   );
                 }
-                return const SizedBox(height: 0);
+                return const SizedBox(height: 15);
               }(),
               () {
-                if(_image != null) {
+                if(_image != null || _imageURL != '') {
                   return Column(
                     children: <Widget>[
                       Center(
                           child: _image == null
-                              ? const Image(
+                              ? _imageURL != '' ?
+                              CachedNetworkImage(
+                              memCacheHeight: 9000,
+                                memCacheWidth: 9000,
+                                imageUrl: _imageURL!,
+                                fadeOutDuration: Duration.zero,
+                                placeholderFadeInDuration: Duration.zero,
+                                fadeInDuration: Duration.zero,
+                                fit: BoxFit.fitWidth,
+                                // width: 374,
+                                width: MediaQuery.of(context).size.width * 0.95,
+                                // height: 300,
+                                placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                              )
+                              : const Image(
                               image: AssetImage('assets/noImageSelected.png'),
                               height: 200,
                               width: 250) //Text('No image selected.')

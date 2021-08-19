@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/list_items_builder.dart';
-import 'package:get_up_park/app/home/groups/group_model.dart';
-import 'package:get_up_park/app/home/groups/groups.dart';
-import 'package:get_up_park/app/home/news/create_article/select_group_tile.dart';
 import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
-
-
-final usersStreamProvider = StreamProvider.autoDispose<List<PTUser>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.usersStream();
-});
+import 'package:google_fonts/google_fonts.dart';
 
 // watch database
 class UserListView extends ConsumerWidget {
@@ -23,29 +15,64 @@ class UserListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
-    return Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.light,
-        title: const Text(
-          'Select Admins',
-          style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w600
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+          brightness: Brightness.light,
+          title: const Text(
+            'Select Admins',
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w600
+            ),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 1,
+          iconTheme: const IconThemeData(
+            color: Colors.black,
+          ),
+          bottom: TabBar(
+            isScrollable: true,
+            labelColor: Colors.red,
+            labelStyle: GoogleFonts.inter(
+              fontWeight: FontWeight.w700,
+            ),
+            unselectedLabelColor: Colors.grey[800],
+            unselectedLabelStyle: GoogleFonts.inter(
+              fontWeight: FontWeight.w400,
+            ),
+            tabs: [
+              Tab(
+                text: 'All Users',
+              ),
+              Tab(
+                text: 'Sport/Club Admins',
+              ),
+              Tab(
+                text: 'Score Reporters',
+              ),
+              Tab(
+                text: 'Super Admins',
+              ),
+            ],
           ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
+        body: TabBarView(
+          children: [
+            _buildContents(context, watch, 'all'),
+            _buildContents(context, watch, userTypes[1]),
+            _buildContents(context, watch, userTypes[2]),
+            _buildContents(context, watch, userTypes[0]),
+          ],
         ),
       ),
-      body: _buildContents(context, watch),
     );
     //print(user.uid);
   }
 
-  Widget _buildContents(BuildContext context, ScopedReader watch) {
+  Widget _buildContents(BuildContext context, ScopedReader watch, String userType) {
     final usersAsyncValue = watch(usersStreamProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 10),
@@ -53,7 +80,18 @@ class UserListView extends ConsumerWidget {
           data: usersAsyncValue,
           itemBuilder: (context, user) {
             if(currentUser.id != user.id) {
-              return UserTile(user: user);
+              if(userType == 'all') {
+                return UserTile(user: user);
+              }
+              else if(userType == user.admin) {
+                return UserTile(user: user);
+              }
+              else if(userType == user.admin) {
+                return UserTile(user: user);
+              }
+              else if(userType == user.admin) {
+                return UserTile(user: user);
+              }
             }
             return const SizedBox(height: 0);
           }

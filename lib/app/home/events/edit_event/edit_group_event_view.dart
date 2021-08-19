@@ -39,6 +39,7 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
     _groupLogoURL = widget.event.groupImageURL;
     _gameID = widget.event.gameID;
     _imageURL = widget.event.imageURL;
+    includeEventDetails = widget.event.description == '' ? false : true;
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -72,6 +73,7 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
   String? _location;
   String? _gameID;
   String? _imageURL;
+  bool? includeEventDetails;
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
@@ -101,7 +103,7 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
         final event = Event(
           id: widget.event.id,
           title: _title!,
-          description: _description!,
+          description: _description ?? '',
           groupImageURL: _groupLogoURL!,
           location: _location!,
           group: _group!,
@@ -111,12 +113,14 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
         );
         await database.setEvent(event);
         await Future.delayed(const Duration(milliseconds: 0));
-        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(AppRoutes.eventView, (route) => !route.hasActiveRouteBelow, arguments: {
-          'event': event,
-        });
-        // Navigator.of(context).pop();
+        // Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(AppRoutes.eventView, (route) => !route.hasActiveRouteBelow, arguments: {
+        //   'event': event,
+        // });
+        Navigator.of(context).pop();
       } catch (e) {
-        _loading = false;
+        setState(() {
+          _loading = false;
+        });
         showExceptionAlertDialog(
           context: context,
           title: 'Operation failed',
@@ -327,19 +331,22 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
                               .grey[300] : Colors.transparent,
                           child: () {
                             if (_groupLogoURL != null) {
-                              return CachedNetworkImage(
-                                memCacheHeight: 300,
-                                memCacheWidth: 300,
-                                fadeOutDuration: Duration.zero,
-                                placeholderFadeInDuration: Duration.zero,
-                                fadeInDuration: Duration.zero,
-                                imageUrl: _groupLogoURL!,
-                                fit: BoxFit.fitWidth,
-                                width: 35,
-                                height: 35,
-                                placeholder: (context, url) =>
-                                const Icon(Icons.group, color: Colors
-                                    .black), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(30),
+                                child: CachedNetworkImage(
+                                  memCacheHeight: 300,
+                                  memCacheWidth: 300,
+                                  fadeOutDuration: Duration.zero,
+                                  placeholderFadeInDuration: Duration.zero,
+                                  fadeInDuration: Duration.zero,
+                                  imageUrl: _groupLogoURL!,
+                                  fit: BoxFit.fitWidth,
+                                  width: 35,
+                                  height: 35,
+                                  placeholder: (context, url) =>
+                                  const Icon(Icons.group, color: Colors
+                                      .black), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                                ),
                               );
                             }
                             return const Icon(Icons.group, color: Colors.black);
@@ -520,69 +527,133 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-                          labelText: 'Location*',
-                          labelStyle: TextStyle(
+                    const SizedBox(height: 15),
+                    InkWell(
+                      onTap: () async {
+                        dynamic result = await Navigator.of(
+                            context, rootNavigator: true).pushNamed(
+                          AppRoutes.locationSearchView,
+                        );
+                        setState(() {
+                          _location = result['address'];
+                        });
+
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                              () {
+                            if(_location != null) {
+                              return Column(
+                                children: [
+                                  Text(
+                                    'Location*',
+                                    style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w400
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                              );
+                            }
+                            return const SizedBox(height: 0);
+                          }(),
+
+                          Text(
+                            _location == null ? 'Location*' : _location!,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: _location == null ? Colors.grey[600] : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Divider(
+                            height: 0,
                             color: Colors.grey,
+                            thickness: 0.5,
                           ),
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 0.5,
-                              )
-                          ),
-                          border: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                                width: 0.5,
-                              )
-                          ),
-                          disabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                                width: 0.5,
-                              )
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 0.5,
-                              )
-                          ),
-                        ),
-                        keyboardAppearance: Brightness.light,
-                        initialValue: _location,
-                        validator: (value) =>
-                        (value ?? '').isNotEmpty
-                            ? null
-                            : 'Event location can\'t be empty',
-                        onChanged: (value) {
-                          setState(() {
-                            _location = value;
-                          });
-                        }
-                    ),
+                        ],
+                      ),
+                    )
+                    // TextFormField(
+                    //     textInputAction: TextInputAction.done,
+                    //     decoration: const InputDecoration(
+                    //       contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+                    //       labelText: 'Location*',
+                    //       labelStyle: TextStyle(
+                    //         color: Colors.grey,
+                    //       ),
+                    //       enabledBorder: UnderlineInputBorder(
+                    //           borderSide: BorderSide(
+                    //             color: Colors.grey,
+                    //             width: 0.5,
+                    //           )
+                    //       ),
+                    //       border: UnderlineInputBorder(
+                    //           borderSide: BorderSide(
+                    //             color: Colors.red,
+                    //             width: 0.5,
+                    //           )
+                    //       ),
+                    //       disabledBorder: UnderlineInputBorder(
+                    //           borderSide: BorderSide(
+                    //             color: Colors.red,
+                    //             width: 0.5,
+                    //           )
+                    //       ),
+                    //       focusedBorder: UnderlineInputBorder(
+                    //           borderSide: BorderSide(
+                    //             color: Colors.grey,
+                    //             width: 0.5,
+                    //           )
+                    //       ),
+                    //     ),
+                    //     keyboardAppearance: Brightness.light,
+                    //     initialValue: _location,
+                    //     validator: (value) =>
+                    //     (value ?? '').isNotEmpty
+                    //         ? null
+                    //         : 'Event location can\'t be empty',
+                    //     onChanged: (value) {
+                    //       setState(() {
+                    //         _location = value;
+                    //       });
+                    //     }
+                    // ),
                   ],
                 ),
               ),
               Divider(thickness: 8, color: Colors.blueGrey[50]),
               Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'About Your Event',
-                      style: GoogleFonts.inter(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'About Your Event',
+                          style: GoogleFonts.inter(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Switch(
+                          value: includeEventDetails!,
+                          onChanged: (value) {
+                            setState(() {
+                              includeEventDetails = value;
+                              print(includeEventDetails);
+                            });
+                          },
+                          activeTrackColor: Colors.red[100],
+                          activeColor: Colors.red,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 5),
                     Text(
@@ -594,53 +665,58 @@ class _EditGroupEventViewState extends State<EditGroupEventView> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextFormField(
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          alignLabelWithHint: true,
-                          labelText: 'Description',
-                          labelStyle: TextStyle(
-                            color: Colors.grey,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 0.0,
-                              )
-                          ),
-                          border: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                                width: 0.5,
-                              )
-                          ),
-                          disabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                                width: 0.5,
-                              )
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 0.0,
-                              )
-                          ),
-                        ),
-                        keyboardAppearance: Brightness.light,
-                        maxLines: 8,
-                        initialValue: _description,
-                        validator: (value) =>
-                        (value ?? '').isNotEmpty
-                            ? null
-                            : 'Event description can\'t be empty',
-                        onChanged: (value) {
-                          setState(() {
-                            _description = value;
-                          });
-                        }
-                    ),
+                        () {
+                      if(includeEventDetails!) {
+                        return TextFormField(
+                            textInputAction: TextInputAction.done,
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                              alignLabelWithHint: true,
+                              labelText: 'Write your description...',
+                              labelStyle: TextStyle(
+                                color: Colors.grey,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 0.0,
+                                  )
+                              ),
+                              border: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 0.5,
+                                  )
+                              ),
+                              disabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 0.5,
+                                  )
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.white,
+                                    width: 0.0,
+                                  )
+                              ),
+                            ),
+                            keyboardAppearance: Brightness.light,
+                            maxLines: 8,
+                            initialValue: _description,
+                            validator: (value) =>
+                            (value ?? '').isNotEmpty && includeEventDetails!
+                                ? null
+                                : 'Event description can\'t be empty',
+                            onChanged: (value) {
+                              setState(() {
+                                _description = value;
+                              });
+                            }
+                        );
+                      }
+                      return const SizedBox(height: 0);
+                    }(),
                   ],
                 ),
               ),

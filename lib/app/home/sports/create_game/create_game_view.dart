@@ -25,7 +25,6 @@ class _CreateGameViewState extends State<CreateGameView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _group = widget.group.name;
     _groupImageURL = widget.group.logoURL;
@@ -61,7 +60,8 @@ class _CreateGameViewState extends State<CreateGameView> {
           _loading = true;
         });
         final database = context.read<FirestoreDatabase>(databaseProvider);
-        final id = documentIdFromCurrentDate();
+        // final id = documentIdFromCurrentDate();
+        final id = '${_group}: ${DateFormat.MMMEd().format(DateTime.parse(_date!))} - ${_opponentName!}';
         final game = Game(
           id: id,
           opponentName: _opponentName!,
@@ -72,10 +72,12 @@ class _CreateGameViewState extends State<CreateGameView> {
           group: _group!,
           date: _date!,
           gameDone: 'false',
+          liveStreamActive: 'false',
+          numberOfLiveUsers: 0,
         );
         final event = Event(
           id: id,
-          title: 'Park Tudor v.s. $_opponentName',
+          title: 'Park Tudor vs. $_opponentName',
           description: _description ?? '',
           location: _location ?? '',
           date: _date!,
@@ -298,54 +300,65 @@ class _CreateGameViewState extends State<CreateGameView> {
                 thickness: 0.5,
                 color: Colors.grey,
               ),
-              TextFormField(
-                  textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                    labelText: 'Location',
-                    labelStyle: TextStyle(
+              InkWell(
+                onTap: () async {
+                  dynamic result = await Navigator.of(
+                      context, rootNavigator: true).pushNamed(
+                    AppRoutes.locationSearchView,
+                  );
+                  setState(() {
+                    _location = result['address'];
+                  });
+
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                        () {
+                      if(_location != null) {
+                        return Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: Text(
+                                'Location',
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    // fontWeight: FontWeight.w400
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        );
+                      }
+                      return const SizedBox(height: 0);
+                    }(),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(
+                        _location == null ? 'Location' : _location!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: _location == null ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Divider(
+                      height: 0,
                       color: Colors.grey,
+                      thickness: 0.5,
                     ),
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
-                        )
-                    ),
-                    border: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.red,
-                          width: 0.5,
-                        )
-                    ),
-                    disabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.red,
-                          width: 0.5,
-                        )
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
-                        )
-                    ),
-                  ),
-                  keyboardAppearance: Brightness.light,
-                  initialValue: _location,
-                  validator: (value) =>
-                  (value ?? '').isNotEmpty
-                      ? null
-                      : 'Event location can\'t be empty',
-                  onChanged: (value) {
-                    setState(() {
-                      _location = value;
-                    });
-                  }
+                  ],
+                ),
               ),
               const SizedBox(height: 6),
               TextFormField(
                 // autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
                 autocorrect: true,
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
@@ -388,7 +401,7 @@ class _CreateGameViewState extends State<CreateGameView> {
                 validator: (value) =>
                 (value ?? '').isNotEmpty
                     ? null
-                    : 'News body can\'t be empty',
+                    : 'Game details can\'t be empty',
                 onChanged: (value) {
                   setState(() {
                     _description = value;

@@ -1,26 +1,19 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
-import 'package:get_up_park/app/home/events/event_card.dart';
+import 'package:get_up_park/app/daily_trivia/begin_trivia_view.dart';
 import 'package:get_up_park/app/home/events/upcoming_events_card.dart';
-import 'package:get_up_park/app/home/home/covid_card.dart';
-import 'package:get_up_park/app/home/home/lunch_card.dart';
-import 'package:get_up_park/app/home/home/lunch_widget.dart';
+import 'package:get_up_park/app/home/home/welcome_card.dart';
+import 'package:get_up_park/app/home/house_cup/standings_card.dart';
 import 'package:get_up_park/app/home/news/cards/featured_news_card.dart';
-import 'package:get_up_park/app/home/news/widgets/news_horizontal_scroll_widget.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-final userStreamProvider =
-StreamProvider.autoDispose<PTUser>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.userStream();
-
-});
 class Home extends ConsumerWidget {
 
   @override
@@ -36,15 +29,15 @@ class Home extends ConsumerWidget {
               slivers: [
                 SliverAppBar(
               brightness: Brightness.light,
-              title: const Text(
+              title: Text(
                 Strings.appName,
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 22,
                 ),
               ),
-              toolbarHeight: 65,
+              toolbarHeight: 55,
               leadingWidth: 60,
               centerTitle: false,
               leading: const Padding(
@@ -57,11 +50,11 @@ class Home extends ConsumerWidget {
                 ),
               ),
               backgroundColor: Colors.white,
-              elevation: 1,
+              elevation: 0,
               forceElevated: true,
               actions: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 12),
                   child: InkWell(
                     onTap: () {
                       Navigator.of(context, rootNavigator: true).pushNamed(
@@ -72,8 +65,8 @@ class Home extends ConsumerWidget {
                       );
                     },
                     child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.grey[200],
+                      radius: 19,
+                      backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75),
                       child: const Icon(
                         Icons.settings,
                         color: Colors.black,
@@ -101,8 +94,23 @@ class Home extends ConsumerWidget {
           color: Colors.transparent,
         );
       },
-      error: (_,__) {
-        return EmptyContent();
+      error: (e,stack) {
+        return Scaffold(
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                EmptyContent(title: 'Oh No!', message: 'A problem has occurred.'),
+                CustomButton(title: 'Debug issue', onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context, rootNavigator: true).popUntil((route) => !route.hasActiveRouteBelow);
+                  Navigator.of(context, rootNavigator: true).pushReplacementNamed(AppRoutes.authOptions);
+                }
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -112,7 +120,7 @@ class Home extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 15),
+          const SizedBox(height: 18),
           // const CovidCard(),
           // const SizedBox(height: 15),
           // const Divider(
@@ -120,17 +128,22 @@ class Home extends ConsumerWidget {
           // ),
           // const SizedBox(height: 12),
 
-          LunchPreviewCard(date: DateTime.now().toString(), user: user),
-          const SizedBox(height: 18),
-          UpcomingEventsCard(admin: user.admin),
+          WelcomeCard(date: DateTime.now().toString(), user: user),
+          const SizedBox(height: 15),
+          // const CovidCard(),
+          // const SizedBox(height: 20),
+          UpcomingEventsCard(user: user),
+
           const SizedBox(height: 25),
-          FeaturedNewsCard(admin: user.admin, category: 'Student Council'),
+          StandingsCard(user: user),
           const SizedBox(height: 25),
-          FeaturedNewsCard(admin: user.admin, category: 'Clubs'),
+          FeaturedNewsCard(user: user, category: 'Student Council'),
           const SizedBox(height: 25),
-          FeaturedNewsCard(admin: user.admin, category: 'Sports'),
+          FeaturedNewsCard(user: user, category: 'Clubs'),
           const SizedBox(height: 25),
-          FeaturedNewsCard(admin: user.admin, category: 'Administration'),
+          FeaturedNewsCard(user: user, category: 'Sports'),
+          const SizedBox(height: 25),
+          FeaturedNewsCard(user: user, category: 'Administration'),
           const SizedBox(height: 50),
         ],
       ),
