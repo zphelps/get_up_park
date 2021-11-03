@@ -5,18 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
 import 'package:get_up_park/app/home/news/widgets/news_vertical_scroll_widget.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/strings.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_up_park/constants/news_categories.dart';
-
-final userStreamProvider =
-StreamProvider.autoDispose((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.userStream();
-});
+import 'package:google_fonts/google_fonts.dart';
 
 // watch database
 class News extends ConsumerWidget {
@@ -26,27 +22,25 @@ class News extends ConsumerWidget {
     final userAsyncValue = watch(userStreamProvider);
     return userAsyncValue.when(
       data: (user) {
-        print('user');
-        print(user.groupsFollowing);
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
             child: CustomScrollView(
-              // physics: const BouncingScrollPhysics(),
+              physics: const RangeMaintainingScrollPhysics(),
               // backgroundColor: Colors.white,
               slivers: [
                 SliverAppBar(
                   forceElevated: true,
                   brightness: Brightness.light,
-                  title: const Text(
+                  title: Text(
                     Strings.news,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 22,
                     ),
                   ),
-                  toolbarHeight: 65,
+                  toolbarHeight: 55,
                   leadingWidth: 60,
                   centerTitle: false,
                   leading: const Padding(
@@ -58,14 +52,14 @@ class News extends ConsumerWidget {
                     ),
                   ),
                   backgroundColor: Colors.white,
-                  elevation: 1,
+                  elevation: 0,
                   actions: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(right: 12),
                       child: Row(
                         children: [
                               () {
-                            if(user.admin == 'Admin' || user.admin == 'Student Admin') {
+                            if(user.admin == userTypes[0] || user.admin == userTypes[1]) {
                               return InkWell(
                                 onTap: () {
                                   Navigator.of(context, rootNavigator: true).pushNamed(
@@ -73,12 +67,12 @@ class News extends ConsumerWidget {
                                   );
                                 },
                                 child: CircleAvatar(
-                                  radius: 18,
+                                  radius: 19,
                                   backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75), //Color(0xffEEEDF0), //Colors.grey[300],
                                   child: const Icon(
-                                    CupertinoIcons.add_circled_solid,
+                                    Icons.add_circle,
                                     color: Colors.black,
-                                    size: 20,
+                                    size: 22,
                                   ),
                                 ),
                               );
@@ -96,7 +90,7 @@ class News extends ConsumerWidget {
                               );
                             },
                             child: CircleAvatar(
-                              radius: 18,
+                              radius: 19,
                               backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75), //Colors.grey[200],
                               child: const Icon(
                                 Icons.settings,
@@ -155,7 +149,13 @@ class _NewsViewState extends State<NewsView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 3),
+        const SizedBox(height: 5),
+        const Divider(
+          height: 0,
+          thickness: 0.175,
+          color: Colors.grey,
+        ),
+        const SizedBox(height: 1),
         SingleChildScrollView(
           controller: _controller,
           scrollDirection: Axis.horizontal,
@@ -167,18 +167,20 @@ class _NewsViewState extends State<NewsView> {
                 NewsCategories.categories.length + 1,
                     (int index) {
                   return ChoiceChip(
-                    backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75),//const Color(0xffEEEDF0),//Color(0xffEBEDF0),//Colors.grey[300],
+                    backgroundColor: const Color(0xffE4E5EA).withOpacity(0.75),//const Color(0xffEEEDF0),
                     pressElevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 13),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                     label: Text(
-                      index == 0 ? 'Following' : NewsCategories.categories[index-1],
+                      index == 0 ? 'All' : NewsCategories.categories[index-1],
                     ),
                     selectedColor: Colors.red[100],
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: _selectedCategoryIndex == index ? Colors.red : Colors.black,
-                      fontSize: 15
+                    labelStyle: GoogleFonts.inter(
+                        fontWeight: _selectedCategoryIndex == index ? FontWeight.w800 : FontWeight.w700,
+                        color: _selectedCategoryIndex == index ? Colors.red : Colors.black,
+                        fontSize: 14
                     ),
+                    shape: StadiumBorder(side: BorderSide(color: _selectedCategoryIndex == index ? Colors.red.shade400 : Colors.grey.shade400, width: 0.125)),
                     selected: _selectedCategoryIndex == index,
                     onSelected: (bool selected) {
                       HapticFeedback.mediumImpact();
@@ -188,10 +190,10 @@ class _NewsViewState extends State<NewsView> {
                           offset = 0;
                         }
                         else if(_selectedCategoryIndex == 3) {
-                          offset = 150;
+                          offset = 80;
                         }
                         else if(_selectedCategoryIndex == 4) {
-                          offset = 175;
+                          offset = 90;
                         }
                         _controller.animateTo(offset, duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
                       });
@@ -202,15 +204,16 @@ class _NewsViewState extends State<NewsView> {
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 1),
         const Divider(
           height: 0,
-          thickness: 0.6,
+          thickness: 0.175,
+          color: Colors.grey,
         ),
         Column(
           children: [
-            const SizedBox(height: 5),
-            _selectedCategoryIndex == 0 ? NewsVerticalScrollWidget(admin: widget.user.admin, groupsFollowing: widget.user.groupsFollowing,) : NewsVerticalScrollWidget(groupsFollowing: widget.user.groupsFollowing, admin: widget.user.admin, category: NewsCategories.categories[_selectedCategoryIndex-1]),
+            const SizedBox(height: 3),
+            _selectedCategoryIndex == 0 ? NewsVerticalScrollWidget(user: widget.user, groupsFollowing: widget.user.groupsFollowing,) : NewsVerticalScrollWidget(groupsFollowing: widget.user.groupsFollowing, user: widget.user, category: NewsCategories.categories[_selectedCategoryIndex-1]),
             const SizedBox(height: 20),
           ],
         ),

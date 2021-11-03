@@ -6,23 +6,19 @@ import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/home/sports/tiles/game_results_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
-
-final gamesStreamProvider = StreamProvider.autoDispose<List<Game>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.gamesStream();
-});
+import 'package:get_up_park/app/user_model.dart';
 
 // watch database
 class GameResultsListWidget extends ConsumerWidget {
 
-  GameResultsListWidget({this.groupName = 'all', required this.group, this.past = false, this.date = '', this.itemCount = 0, required this.admin});
+  GameResultsListWidget({this.groupName = 'all', required this.group, this.past = false, this.date = '', this.itemCount = 0, required this.user});
 
   final String groupName;
   final Group group;
   final bool past;
   final int itemCount;
   final String date;
-  final String admin;
+  final PTUser user;
 
   int lastGamesLength = 0;
 
@@ -33,18 +29,18 @@ class GameResultsListWidget extends ConsumerWidget {
 
     final gamesAsyncValue = watch(gamesStreamProvider);
 
-    return LoadGameResults(gamesAsyncValue: gamesAsyncValue, groupName: groupName, group: group, itemCount: itemCount, admin: admin);
+    return LoadGameResults(gamesAsyncValue: gamesAsyncValue, groupName: groupName, group: group, itemCount: itemCount, user: user);
   }
 }
 
 class LoadGameResults extends StatefulWidget {
-  const LoadGameResults({required this.gamesAsyncValue, required this.groupName, required this.group, required this.itemCount, required this.admin});
+  const LoadGameResults({required this.gamesAsyncValue, required this.groupName, required this.group, required this.itemCount, required this.user});
 
   final AsyncValue<List<Game>> gamesAsyncValue;
   final String groupName;
   final Group group;
   final int itemCount;
-  final String admin;
+  final PTUser user;
 
   @override
   _LoadGameResultsState createState() => _LoadGameResultsState();
@@ -86,7 +82,7 @@ class _LoadGameResultsState extends State<LoadGameResults> {
         return Column(
           children: [
             const Divider(height: 0),
-            GameResultsTile(game: filteredGames[index], admin: widget.admin, group: widget.group),
+            GameResultsTile(game: filteredGames[index], user: widget.user, group: widget.group),
           ],
         );
       },

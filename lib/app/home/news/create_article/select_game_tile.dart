@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:intl/intl.dart';
 

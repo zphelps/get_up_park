@@ -2,14 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_up_park/app/home/events/event_model.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class UpcomingEventTile extends StatelessWidget {
-  const UpcomingEventTile({required this.event, required this.admin});
+  const UpcomingEventTile({required this.event, required this.user});
 
   final Event event;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class UpcomingEventTile extends StatelessWidget {
           Navigator.of(context, rootNavigator: true).pushNamed(
               AppRoutes.gameView,
               arguments: {
-                'admin': admin,
+                'user': user,
                 'gameID': event.gameID,
               }
           );
@@ -59,7 +60,7 @@ class UpcomingEventTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.565,
                   child: Text(
                     event.title,
                     style: const TextStyle(

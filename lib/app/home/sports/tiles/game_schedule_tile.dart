@@ -1,19 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
-import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
-import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameScheduleTile extends StatelessWidget {
-  const GameScheduleTile({required this.game, required this.admin, required this.group});
+  const GameScheduleTile({required this.game, required this.user, required this.group});
 
   final Game game;
-  final String admin;
+  final PTUser user;
   final Group group;
 
   @override
@@ -24,7 +21,7 @@ class GameScheduleTile extends StatelessWidget {
             AppRoutes.gameView,
             arguments: {
               'gameID': game.id,
-              'admin': admin,
+              'user': user,
             }
         );
       },
@@ -45,7 +42,7 @@ class GameScheduleTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     const Text(
-                      'Panthers',
+                      'Park Tudor',
                       style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_up_park/services/push_notifications.dart';
 
 class AddAnnouncement extends StatefulWidget {
   const AddAnnouncement({Key? key}) : super(key: key);
@@ -53,6 +54,7 @@ class _AddAnnouncementState extends State<AddAnnouncement> {
         final id = documentIdFromCurrentDate();
         final announcement = Announcement(id: id, title: _title ?? '', body: _body ?? '', url: _url ?? '', date: DateTime.now().toString());
         await database.setAnnouncement(announcement);
+        await sendCustomNotification(_title!, _body!);
         Navigator.of(context).pop();
       } catch (e) {
         showExceptionAlertDialog(
@@ -80,6 +82,7 @@ class _AddAnnouncementState extends State<AddAnnouncement> {
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
+        elevation: 1,
         backgroundColor: Colors.white,
         actions: <Widget>[
           FlatButton(
@@ -87,7 +90,7 @@ class _AddAnnouncementState extends State<AddAnnouncement> {
               'Add',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.black,
+                color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -167,23 +170,23 @@ class _AddAnnouncementState extends State<AddAnnouncement> {
         (value ?? '').isNotEmpty ? null : 'Description can\'t be empty',
         onSaved: (value) => _body = value,
       ),
-      TextFormField(
-        decoration: const InputDecoration(
-            labelText: 'URL',
-            labelStyle: TextStyle(
-              color: Colors.grey,
-            ),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.red,
-                  width: 2,
-                )
-            )
-        ),
-        keyboardAppearance: Brightness.light,
-        initialValue: _url,
-        onSaved: (value) => _url = value,
-      ),
+      // TextFormField(
+      //   decoration: const InputDecoration(
+      //       labelText: 'URL',
+      //       labelStyle: TextStyle(
+      //         color: Colors.grey,
+      //       ),
+      //       focusedBorder: UnderlineInputBorder(
+      //           borderSide: BorderSide(
+      //             color: Colors.red,
+      //             width: 2,
+      //           )
+      //       )
+      //   ),
+      //   keyboardAppearance: Brightness.light,
+      //   initialValue: _url,
+      //   onSaved: (value) => _url = value,
+      // ),
     ];
   }
 }

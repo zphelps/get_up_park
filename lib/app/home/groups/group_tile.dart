@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,12 +8,15 @@ import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class GroupTile extends StatefulWidget {
 
   final Group group;
+  final List<dynamic> groupsFollowing;
 
-  const GroupTile({required this.group});
+  const GroupTile({required this.group, required this.groupsFollowing});
 
   @override
   State<GroupTile> createState() => _GroupTileState();
@@ -20,29 +24,35 @@ class GroupTile extends StatefulWidget {
 
 class _GroupTileState extends State<GroupTile> {
 
-  bool isFollowing = false;
+  bool showCheck = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(CachedNetworkImageProvider(widget.group.backgroundImageURL, cacheKey: widget.group.backgroundImageURL), context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              // color: Colors.black.withOpacity(0.125),
-              // spreadRadius: 0,
-              // blurRadius: 5,
-              // offset: const Offset(0, 1), // changes position of shadow
-              color: Colors.black.withOpacity(0.15),
-              spreadRadius: 0,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.12),
+              spreadRadius: 1,
+              blurRadius: 12,
+              offset: const Offset(0, 1),
+              // color: Colors.black.withOpacity(0.15),
+              // spreadRadius: 1,
+              // blurRadius: 15,
+              // offset: const Offset(0, 2),
             ),
           ]
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), //10, 4
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: InkWell(onTap: () async {
         HapticFeedback.lightImpact();
         if(widget.group.sport == '') {
@@ -107,17 +117,77 @@ class _GroupTileState extends State<GroupTile> {
                   //   fontSize: 12,
                   // ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  widget.group.name,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                const SizedBox(height: 1),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.475,
+                  child: AutoSizeText(
+                    widget.group.name,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 16,
                   ),
                 ),
               ],
             ),
             const Spacer(),
+                () {
+              if(!widget.groupsFollowing.contains(widget.group.name)) {
+                return Column(
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        final database = context.read<FirestoreDatabase>(databaseProvider);
+                        await database.followGroup(database.uid, widget.group.name);
+                        setState(() {
+                          showCheck = true;
+                        });
+                        await Future.delayed(const Duration(seconds: 2));
+                        setState(() {
+                          showCheck = false;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        child: Text(
+                          'Follow',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // const SizedBox(height: 3),
+                  ],
+                );
+              }
+              return const SizedBox(height: 0);
+            }(),
+                () {
+              if(showCheck) {
+                return Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 15),
+                  ],
+                );
+              }
+              return const SizedBox(height: 0);
+            }(),
+            const SizedBox(width: 2),
             const Icon(
               Icons.chevron_right,
             ),

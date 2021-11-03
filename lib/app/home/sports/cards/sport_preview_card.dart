@@ -2,13 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/widgets/game_results_list_widget.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 
 class SportPreviewCard extends StatelessWidget {
-  const SportPreviewCard({required this.group, required this.admin});
+  const SportPreviewCard({required this.group, required this.user});
 
   final Group group;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class SportPreviewCard extends StatelessWidget {
                 ),
               ),
             ),
-            GameResultsListWidget(group: group, groupName: group.name, itemCount: 5, admin: admin),
+            GameResultsListWidget(group: group, groupName: group.name, itemCount: 5, user: user),
             // EventListWidget(group: widget.group.name),
           ],
         ),

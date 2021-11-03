@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
+import 'package:get_up_park/app/home/news/time_ago.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,29 +16,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ImagePostCard extends StatelessWidget {
-  const ImagePostCard({required this.article, required this.admin, required this.group});
+  const ImagePostCard({required this.article, required this.user, required this.group});
 
   final Article article;
   final Group group;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), //6, 3
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), //10, 6
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15), //6
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withOpacity(0.175),
               spreadRadius: 0,
-              blurRadius: 15,
+              blurRadius: 12,
               offset: const Offset(0, 3),
-              // color: Colors.black.withOpacity(0.2),
+              // color: Colors.black.withOpacity(0.15), //0.35
               // spreadRadius: 0,
-              // blurRadius: 3,
-              // offset: const Offset(0, 1),
+              // blurRadius: 15,
+              // offset: const Offset(0, 3),
             )
           ]
       ),
@@ -85,34 +88,34 @@ class ImagePostCard extends StatelessWidget {
               ),
               title: Text(
                 article.group,
-                style: const TextStyle(
+                style: GoogleFonts.inter(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                   color: Colors.black,
                 ),
               ),
               subtitle: Text(
-                  DateFormat.yMMMMd('en_US')
-                      .format(DateTime.parse(article.date)),
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[800],
+                  // DateFormat.yMMMMd('en_US')
+                  //     .format(DateTime.parse(article.date)),
+                '${TimeAgo.timeAgoSinceDate(article.date)}',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[700],
                   fontSize: 12,
-                  fontFamily: 'SanFrancisco',
                 ),
               ),
               trailing: PopupMenuButton(
                 icon: Icon(
                   Icons.more_vert,
                   size: 20,
-                  color: Colors.grey[700],
+                  color: Colors.grey[800],
                 ),
                 //color: Colors.black,
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(15.0))
                 ),
                 itemBuilder: (BuildContext bc) {
-                  if(admin == 'Admin' || admin == 'Student Admin') {
+                  if(user.admin == userTypes[0] || (user.admin == userTypes[1] && user.groupsUserCanAccess.contains(article.group))) {
                     return [
                       const PopupMenuItem(child: Text("Delete"), value: "delete"),
                       const PopupMenuItem(
@@ -210,7 +213,7 @@ class ImagePostCard extends StatelessWidget {
                         //   // fontFamily: 'SanFrancisco',
                         // ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 15),
                     ],
                   ),
                 );
@@ -242,14 +245,42 @@ class ImagePostCard extends StatelessWidget {
                       fit: BoxFit.fitWidth,
                       // width: 374,
                       width: MediaQuery.of(context).size.width * 0.95,
-                      // height: 300,
-                      placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif'), fit: BoxFit.cover),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                      height: CachedNetworkImage(imageUrl: article.imageURL,).height,
+                      placeholder: (context, url) => const Image(image: AssetImage('assets/skeletonImage.gif',), fit: BoxFit.cover, height: 200,),//Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            // const SizedBox(height: 5),
+            // const Divider(height: 15),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Text(
+            //           '${DateFormat.MMMEd('en_US')
+            //           .format(DateTime.parse(article.date))}',
+            //         style: GoogleFonts.inter(
+            //           color: Colors.grey[700],
+            //           fontWeight: FontWeight.w400,
+            //           fontSize: 13,
+            //         ),
+            //       ),
+            //       Text(
+            //         '${DateFormat.jm('en_US')
+            //             .format(DateTime.parse(article.date))}',
+            //         style: GoogleFonts.inter(
+            //           color: Colors.grey[700],
+            //           fontWeight: FontWeight.w400,
+            //           fontSize: 13,
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            const SizedBox(height: 12), //12
           ],
         ),
       ),

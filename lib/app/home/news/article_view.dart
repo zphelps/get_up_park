@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/home/news/widgets/news_horizontal_scroll_widget.dart';
 import 'package:get_up_park/app/home/news/widgets/article_group_tile.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/news_categories.dart';
@@ -15,10 +16,10 @@ import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
 
 class ArticleView extends StatelessWidget {
-  const ArticleView({required this.admin, required this.article});
+  const ArticleView({required this.user, required this.article});
 
   final Article article;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,7 @@ class ArticleView extends StatelessWidget {
             ),
             actions: [
                   () {
-                if(admin == 'Admin' || admin == 'Student Admin') {
+                if(user.admin == userTypes[0] || (user.admin == userTypes[1] && user.groupsUserCanAccess.contains(article.group))) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: CircleAvatar(
@@ -142,17 +143,20 @@ class ArticleView extends StatelessWidget {
                         }
                     );
                   },
-                  child: CachedNetworkImage(
-                    memCacheWidth: 3000,
-                    memCacheHeight: 3000,
-                    imageUrl: article.imageURL,
-                    fit: BoxFit.cover,
-                    width: 175,
-                    placeholder: (context, url) =>
-                    const Image(
-                        image: AssetImage('assets/skeletonImage.gif'),
-                        fit: BoxFit
-                            .cover), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                  child: Hero(
+                    tag: article.body,
+                    child: CachedNetworkImage(
+                      memCacheWidth: 3000,
+                      memCacheHeight: 3000,
+                      imageUrl: article.imageURL,
+                      fit: BoxFit.cover,
+                      width: 175,
+                      placeholder: (context, url) =>
+                      const Image(
+                          image: AssetImage('assets/skeletonImage.gif'),
+                          fit: BoxFit
+                              .cover), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                    ),
                   ),
                 ),
               ),
@@ -276,7 +280,7 @@ class ArticleView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    NewsHorizontalScrollWidget(admin: admin, category: article.category, excludedArticleID: article.id),
+                    NewsHorizontalScrollWidget(user: user, category: article.category, excludedArticleID: article.id),
                     const SizedBox(height: 35),
                   ]
               )

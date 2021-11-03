@@ -1,19 +1,12 @@
 import 'dart:io';
 
 import 'package:alert_dialogs/alert_dialogs.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:get_up_park/app/home/events/event_model.dart';
-import 'package:get_up_park/app/home/groups/group_model.dart';
-import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/home/sports/opponent_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
-import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:images_picker/images_picker.dart';
-import 'package:intl/intl.dart';
 
 
 class CreateOpponentView extends StatefulWidget {
@@ -27,7 +20,6 @@ class _CreateOpponentViewState extends State<CreateOpponentView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

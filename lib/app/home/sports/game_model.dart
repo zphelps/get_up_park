@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 @immutable
 class Game extends Equatable {
-  const Game({required this.id, required this.sport, required this.opponentName, required this.group, required this.date, required this.homeScore, required this.opponentScore, required this.opponentLogoURL, required this.gameDone});
+  const Game({required this.id, required this.sport, required this.opponentName,
+    required this.group, required this.date, required this.homeScore, required this.opponentScore,
+    required this.opponentLogoURL, required this.gameDone, required this.liveStreamActive, required this.numberOfLiveUsers});
   final String id;
   final String sport;
   final String opponentName;
@@ -13,9 +15,11 @@ class Game extends Equatable {
   final String opponentScore;
   final String opponentLogoURL;
   final String gameDone;
+  final String liveStreamActive;
+  final int numberOfLiveUsers;
 
   @override
-  List<Object> get props => [id, sport, opponentName, group, date, homeScore, opponentScore, opponentLogoURL, gameDone];
+  List<Object> get props => [id, sport, opponentName, group, date, homeScore, opponentScore, opponentLogoURL, gameDone, liveStreamActive, numberOfLiveUsers];
 
   @override
   bool get stringify => true;
@@ -65,7 +69,17 @@ class Game extends Equatable {
       throw StateError('missing gameDone for game: $documentId');
     }
 
-    return Game(id: documentId, sport: sport, opponentName: opponentName, group: group, date: date, homeScore: homeScore, opponentScore: opponentScore, opponentLogoURL: opponentLogoURL, gameDone: gameDone);
+    final liveStreamActive = data['liveStreamActive'] as String?;
+    if (liveStreamActive == null) {
+      throw StateError('missing liveStreamActive for game: $documentId');
+    }
+
+    final numberOfLiveUsers = data['numberOfLiveUsers'] as int?;
+    if (numberOfLiveUsers == null) {
+      throw StateError('missing numberOfLiveUsers for game: $documentId');
+    }
+
+    return Game(id: documentId, sport: sport, opponentName: opponentName, group: group, date: date, homeScore: homeScore, opponentScore: opponentScore, opponentLogoURL: opponentLogoURL, gameDone: gameDone, liveStreamActive: liveStreamActive, numberOfLiveUsers: numberOfLiveUsers);
   }
 
   Map<String, dynamic> toMap() {
@@ -78,6 +92,8 @@ class Game extends Equatable {
       'opponentScore': opponentScore,
       'opponentLogoURL': opponentLogoURL,
       'gameDone': gameDone,
+      'liveStreamActive': liveStreamActive,
+      'numberOfLiveUsers': numberOfLiveUsers,
     };
   }
 }

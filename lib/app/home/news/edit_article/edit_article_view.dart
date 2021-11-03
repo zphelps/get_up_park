@@ -144,7 +144,7 @@ class _EditArticleViewState extends State<EditArticleView> {
         category: _category!,
         group: _group!,
         groupLogoURL: _groupLogoURL!,
-        date: DateTime.now().toString(),
+        date: widget.article.date,
         gameID: '',
         gameDone: widget.article.gameDone,
       );
@@ -201,7 +201,7 @@ class _EditArticleViewState extends State<EditArticleView> {
         category: _category!,
         group: _group!,
         groupLogoURL: _groupLogoURL!,
-        date: DateTime.now().toString(),
+        date: widget.article.date,
         gameID: '',
         gameDone: widget.article.gameDone,
       ), _image == null ? false : true): _buildContents(),
@@ -374,16 +374,19 @@ class _EditArticleViewState extends State<EditArticleView> {
                                   .grey[300] : Colors.transparent,
                               child: () {
                                 if (_groupLogoURL != null) {
-                                  return CachedNetworkImage(
-                                    memCacheHeight: 300,
-                                    memCacheWidth: 300,
-                                    imageUrl: _groupLogoURL!,
-                                    fit: BoxFit.fitHeight,
-                                    width: 30,
-                                    height: 30,
-                                    placeholder: (context, url) =>
-                                    const Icon(Icons.group, color: Colors
-                                        .black), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: CachedNetworkImage(
+                                      memCacheHeight: 300,
+                                      memCacheWidth: 300,
+                                      imageUrl: _groupLogoURL!,
+                                      fit: BoxFit.fitHeight,
+                                      width: 35,
+                                      height: 35,
+                                      placeholder: (context, url) =>
+                                      const Icon(Icons.group, color: Colors
+                                          .black), //Lottie.asset('assets/skeleton.json'),//SpinKitCubeGrid(color: Colors.red),
+                                    ),
                                   );
                                 }
                                 return const Icon(Icons.group, color: Colors.black);

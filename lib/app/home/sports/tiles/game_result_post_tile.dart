@@ -1,19 +1,17 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
-import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
-import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameResultPostTile extends StatelessWidget {
-  const GameResultPostTile({required this.game, required this.admin, required this.group});
+  const GameResultPostTile({required this.game, required this.user, required this.group});
 
   final Game game;
-  final String admin;
+  final PTUser user;
   final Group group;
 
   @override
@@ -24,7 +22,7 @@ class GameResultPostTile extends StatelessWidget {
             AppRoutes.gameView,
             arguments: {
               'gameID': game.id,
-              'admin': admin,
+              'user': user,
             }
         );
       },
@@ -45,7 +43,7 @@ class GameResultPostTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Panthers',
+                      'Park Tudor',
                       style: TextStyle(
                           color: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? Colors.black : Colors.grey[700],
                           fontWeight: int.parse(game.homeScore) >= int.parse(game.opponentScore) ? FontWeight.w700 : FontWeight.w400,
@@ -73,12 +71,16 @@ class GameResultPostTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      game.opponentName,
-                      style: TextStyle(
-                          color: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? Colors.black : Colors.grey[700],
-                          fontWeight: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? FontWeight.w700 : FontWeight.w400,
-                          fontSize: 14
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: AutoSizeText(
+                        game.opponentName,
+                        style: TextStyle(
+                            color: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? Colors.black : Colors.grey[700],
+                            fontWeight: int.parse(game.opponentScore) >= int.parse(game.homeScore) ? FontWeight.w700 : FontWeight.w400,
+                            fontSize: 14
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -111,7 +113,7 @@ class GameResultPostTile extends StatelessWidget {
             Container(height: 50, width: 0.25, color: Colors.grey[400],),
             const SizedBox(width: 5),
             Container(
-              width: MediaQuery.of(context).size.width * 0.175,
+              width: MediaQuery.of(context).size.width * 0.15,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,

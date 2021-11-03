@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/home/news/cards/small_news_card.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/shared_widgets/horizontal_list_builder.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
-
-final articleStreamProvider = StreamProvider.autoDispose<List<Article>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.articleStream();
-});
 
 // watch database
 class NewsHorizontalScrollWidget extends ConsumerWidget {
 
-  NewsHorizontalScrollWidget({required this.admin, this.category = 'all', this.group = 'none', this.excludedArticleID = 'none'});
+  NewsHorizontalScrollWidget({required this.user, this.category = 'all', this.group = 'none', this.excludedArticleID = 'none'});
 
   final String category;
   final String group;
   final String excludedArticleID;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
@@ -45,20 +41,20 @@ class NewsHorizontalScrollWidget extends ConsumerWidget {
         itemBuilder: (context, article) {
           if(category == 'all' && group == 'none' && excludedArticleID != article.id) {
             if(article.imageURL.isNotEmpty && article.title.isNotEmpty) {
-              return SmallNewsCard(admin: admin, article: article);
+              return SmallNewsCard(user: user, article: article);
             }
           }
           else if(group != 'none' && excludedArticleID != article.id) {
             if(article.group == group) {
               if(article.imageURL.isNotEmpty && article.title.isNotEmpty) {
-                return SmallNewsCard(admin: admin, article: article);
+                return SmallNewsCard(user: user, article: article);
               }
             }
           }
           else if(category != 'all' && excludedArticleID != article.id) {
             if(article.category == category) {
               if(article.imageURL.isNotEmpty && article.title.isNotEmpty) {
-                return SmallNewsCard(admin: admin, article: article);
+                return SmallNewsCard(user: user, article: article);
               }
             }
           }

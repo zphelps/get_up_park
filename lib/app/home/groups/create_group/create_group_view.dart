@@ -274,30 +274,6 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                             );
                           }).toList(),
                         ),
-                        // TextFormField(
-                        //   decoration: const InputDecoration(
-                        //       labelText: 'Description',
-                        //       labelStyle: TextStyle(
-                        //         color: Colors.grey,
-                        //       ),
-                        //       focusedBorder: UnderlineInputBorder(
-                        //           borderSide: BorderSide(
-                        //             color: Colors.red,
-                        //             width: 2,
-                        //           )
-                        //       )
-                        //   ),
-                        //   keyboardAppearance: Brightness.light,
-                        //   //expands: true,
-                        //   minLines: 3,
-                        //   maxLines: 20,
-                        //   initialValue: _body,
-                        //   validator: (value) =>
-                        //   (value ?? '').isNotEmpty
-                        //       ? null
-                        //       : 'Article description can\'t be empty',
-                        //   onSaved: (value) => _body = value,
-                        // ),
                       ],
                     ),
                   ),

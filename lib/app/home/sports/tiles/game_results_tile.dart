@@ -3,19 +3,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
+import 'package:get_up_park/app/home/settings/user_tile.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameResultsTile extends StatelessWidget {
-  const GameResultsTile({required this.game, required this.admin, required this.group});
+  const GameResultsTile({required this.game, required this.user, required this.group});
 
   final Game game;
   final Group group;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class GameResultsTile extends StatelessWidget {
       actionPane: const SlidableStrechActionPane(),
       actionExtentRatio: 0.25,
       secondaryActions: () {
-        if (admin == 'true') {
+        if (user.admin == userTypes[0]) {
           return <Widget>[
             IconSlideAction(
               caption: 'Edit Game',
@@ -84,7 +86,7 @@ class GameResultsTile extends StatelessWidget {
               AppRoutes.gameView,
               arguments: {
                 'game': game,
-                'admin': admin,
+                'user': user,
                 'group': group,
               }
           );

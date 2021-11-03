@@ -45,6 +45,7 @@ class _UpdateGameScoreViewState extends State<UpdateGameScoreView> {
   String? _opponentScore;
   String? _description;
   bool? _isDone;
+  bool _sendNotification = false;
   bool _post = false;
 
   bool _validateAndSaveForm() {
@@ -70,12 +71,17 @@ class _UpdateGameScoreViewState extends State<UpdateGameScoreView> {
               gameID: widget.game.id, date: DateTime.now().toString(), category: 'Sports',
               group: widget.event.group, groupLogoURL: widget.event.groupImageURL, id: documentIdFromCurrentDate(), imageURL: '', gameDone: 'true');
           await database.setArticle(article);
-          sendNotification(article, opponent: widget.game.opponentName, opponentLogoURL: widget.game.opponentLogoURL);
+          if(_sendNotification) {
+            sendNotification(article, opponent: widget.game.opponentName, opponentLogoURL: widget.game.opponentLogoURL);
+          }
           // sendNewsNotifications(article, opponent: widget.game.opponentName, opponentLogoURL: widget.game.opponentLogoURL);
         }
         await database.updateGameScore(widget.game.id, _opponentScore!, _homeScore!, _isDone! ? 'true' : 'false');
         Navigator.of(context).pop();
       } catch (e) {
+        setState(() {
+          _loading = false;
+        });
         showExceptionAlertDialog(
           context: context,
           title: 'Operation failed',
@@ -160,7 +166,7 @@ class _UpdateGameScoreViewState extends State<UpdateGameScoreView> {
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                  labelText: 'Panther score',
+                  labelText: 'Park Tudor score',
                   labelStyle: TextStyle(
                     color: Colors.grey,
                   ),
@@ -290,73 +296,119 @@ class _UpdateGameScoreViewState extends State<UpdateGameScoreView> {
                   if(int.parse(_homeScore!) > int.parse(_opponentScore!)) {
                     if(_isDone!) {
                       setState(() {
-                        _description = 'FINAL: Park Tudor won $_homeScore-$_opponentScore against ${widget.game.opponentName}';
+                        _description = 'FINAL: Park Tudor won against ${widget.game.opponentName}!';
                       });
                     }
                     else {
                       setState(() {
-                        _description = 'UPDATE: Park Tudor is up $_homeScore-$_opponentScore against ${widget.game.opponentName}';
+                        _description = 'UPDATE: Park Tudor is up $_homeScore-$_opponentScore against ${widget.game.opponentName}!';
+                      });
+                    }
+                  }
+                  else if(int.parse(_homeScore!) < int.parse(_opponentScore!)) {
+                    if(_isDone!) {
+                      setState(() {
+                        _description = 'FINAL: Park Tudor lost against ${widget.game.opponentName}.';
+                      });
+                    }
+                    else {
+                      setState(() {
+                        _description = 'UPDATE: Park Tudor is down $_homeScore-$_opponentScore against ${widget.game.opponentName}.';
                       });
                     }
                   }
                   else {
                     if(_isDone!) {
                       setState(() {
-                        _description = 'FINAL: Park Tudor lost $_homeScore-$_opponentScore against ${widget.game.opponentName}';
+                        _description = 'FINAL: Park Tudor tied against ${widget.game.opponentName}.';
                       });
                     }
                     else {
                       setState(() {
-                        _description = 'UPDATE: Park Tudor is down $_homeScore-$_opponentScore against ${widget.game.opponentName}';
+                        _description = 'UPDATE: Park Tudor is tied against ${widget.game.opponentName}.';
                       });
                     }
                   }
-                  return TextFormField(
-                      textInputAction: TextInputAction.done,
-                      decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                        // alignLabelWithHint: true,
-                        labelText: 'Game Summary',
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
+                  return Column(
+                    children: [
+                      TextFormField(
+                          textInputAction: TextInputAction.done,
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                            // alignLabelWithHint: true,
+                            labelText: 'Game Summary',
+                            labelStyle: TextStyle(
                               color: Colors.grey,
-                              width: 0.5,
-                            )
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 0.5,
+                                )
+                            ),
+                            border: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 0.5,
+                                )
+                            ),
+                            disabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 0.5,
+                                )
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 0.5,
+                                )
+                            ),
+                          ),
+                          keyboardAppearance: Brightness.light,
+                          maxLines: 6,
+                          initialValue: _description,
+                          validator: (value) =>
+                          (value ?? '').isNotEmpty
+                              ? null
+                              : 'Event description can\'t be empty',
+                          onChanged: (value) {
+                            setState(() {
+                              _description = value;
+                            });
+                          }
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            _sendNotification = !_sendNotification;
+                          });
+                        },
+                        visualDensity: const VisualDensity(vertical: -4),
+                        contentPadding: const  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.grey[300],
+                          child: const Icon(Icons.notifications_outlined, color: Colors.black),
                         ),
-                        border: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                              width: 0.5,
-                            )
+                        title: const Text(
+                          'Send Notification?',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                          ),
                         ),
-                        disabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                              width: 0.5,
-                            )
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 0.5,
-                            )
+                        trailing: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            _sendNotification ? Icons.check_circle : Icons.check_circle_outline,
+                            color: _sendNotification ? Colors.red : Colors.grey,
+                          ),
                         ),
                       ),
-                      keyboardAppearance: Brightness.light,
-                      maxLines: 6,
-                      initialValue: _description,
-                      validator: (value) =>
-                      (value ?? '').isNotEmpty
-                          ? null
-                          : 'Event description can\'t be empty',
-                      onChanged: (value) {
-                        setState(() {
-                          _description = value;
-                        });
-                      }
+                      const Divider(height: 0, color: Colors.grey, thickness: 0.5),
+                    ],
                   );
                 }
                 return const SizedBox(height: 0);

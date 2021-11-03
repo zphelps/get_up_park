@@ -1,33 +1,26 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/empty_content.dart';
-import 'package:get_up_park/app/home/events/calendar_event_list_tile.dart';
-import 'package:get_up_park/app/home/events/event_list_tile.dart';
+import 'package:get_up_park/app/home/events/event_card.dart';
 import 'package:get_up_park/app/home/events/event_model.dart';
-import 'package:get_up_park/app/home/events/group_events_card.dart';
 import 'package:get_up_park/app/home/events/upcoming_event_tile.dart';
-import 'package:get_up_park/app/home/news/article_model.dart';
-import 'package:get_up_park/app/home/news/old_files/large_news_card.dart';
-import 'package:get_up_park/shared_widgets/vertical_list_builder.dart';
+import 'package:get_up_park/app/home/house_cup/house_cup_event_tile.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 
-
-final eventsStreamProvider = StreamProvider.autoDispose<List<Event>>((ref) {
-  final database = ref.watch(databaseProvider);
-  return database.eventsStream();
-});
 
 // watch database
 class EventListWidget extends ConsumerWidget {
 
-  EventListWidget({this.group = 'all', this.past = false, this.date = '', this.itemCount = 0, required this.admin});
+  EventListWidget({this.group = 'all', this.past = false, this.date = '', this.itemCount = 0, required this.user, this.emptyTitle = 'No events found.', this.emptyMessage = 'Please check back later.'});
 
   final String group;
   final bool past;
   final int itemCount;
   final String date;
-  final String admin;
+  final PTUser user;
+  final String emptyTitle;
+  final String emptyMessage;
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
@@ -71,7 +64,7 @@ class EventListWidget extends ConsumerWidget {
     });
 
     if(allEvents.isEmpty) {
-      return EmptyContent(title: 'No events found', message: 'Please check back later.', center: true);
+      return EmptyContent(title: emptyTitle, message: emptyMessage, center: true);
     }
 
     return ListView.separated(
@@ -80,37 +73,26 @@ class EventListWidget extends ConsumerWidget {
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       separatorBuilder: (context, index) {
-        return const Divider(height: 0, thickness: 0.65,);
+        return group == '' ? const Divider(height: 0, thickness: 0.65,) : const SizedBox(height: 0);
       },
       itemBuilder: (context, index) {
         if(date == '') {
           if(past) {
             if(allEvents[index].group == group && DateTime.parse(allEvents[index].date).isBefore(DateTime.now())) {
-              return Column(
-                children: [
-                  // const Divider(height: 0, thickness: 0.65),
-                  EventListTile(event: allEvents[index]),
-                ],
-              );
+              return EventCard(event: allEvents[index]);
             }
           }
           else {
             if(group == 'all') {
               return Column(
                 children: [
-                  UpcomingEventTile(event: allEvents[index], admin: admin,),
-                  // const Divider(height: 0, thickness: 0.65),
+                  UpcomingEventTile(event: allEvents[index], user: user,),
                 ],
               );
             }
             else {
               if(allEvents[index].group == group && DateTime.parse(allEvents[index].date).isAfter(DateTime.now())) {
-                return Column(
-                  children: [
-                    // const Divider(height: 0, thickness: 0.65),
-                    EventListTile(event: allEvents[index]),
-                  ],
-                );
+                return EventCard(event: allEvents[index]);
               }
             }
           }
@@ -119,18 +101,13 @@ class EventListWidget extends ConsumerWidget {
           if(group == 'all') {
             return Column(
               children: [
-                UpcomingEventTile(event: allEvents[index], admin: admin),
+                UpcomingEventTile(event: allEvents[index], user: user),
                 // const Divider(height: 0, thickness: 0.65),
               ],
             );
           }
           else if(allEvents[index].group == group && DateTime.parse(date).day == DateTime.parse(allEvents[index].date).day) {
-            return Column(
-              children: [
-                // const Divider(height: 0, thickness: 0.65),
-                EventListTile(event: allEvents[index]),
-              ],
-            );
+            return EventCard(event: allEvents[index]);
           }
         }
         return const SizedBox(width: 0);

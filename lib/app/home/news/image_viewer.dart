@@ -18,13 +18,16 @@ class FullscreenImageViewer extends StatelessWidget {
           color: Colors.grey[900],
         ),
         backgroundColor: Colors.grey[50],
-        toolbarHeight: 60,
+        toolbarHeight: 40,
         elevation: 0,
       ),
       body: GestureDetector(
-        onVerticalDragDown: (drag) {
+        onTap: () {
           Navigator.of(context).pop();
         },
+        // onVerticalDragDown: (drag) {
+        //   Navigator.of(context).pop();
+        // },
         child: Center(
           // ignore: sized_box_for_whitespace
           child: Container(

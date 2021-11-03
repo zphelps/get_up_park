@@ -2,15 +2,16 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
+import 'package:get_up_park/app/user_model.dart';
 import 'package:get_up_park/constants/news_categories.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class SmallNewsCard extends StatelessWidget {
-  const SmallNewsCard({required this.admin, required this.article});
+  const SmallNewsCard({required this.user, required this.article});
 
   final Article article;
-  final String admin;
+  final PTUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class SmallNewsCard extends StatelessWidget {
             AppRoutes.articleView,
             arguments: {
               'article': article,
-              'admin': admin,
+              'user': user,
             }
         );
       },

@@ -1,20 +1,22 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firestore_service/firestore_service.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_up_park/app/announcements/announcement_model.dart';
-import 'package:get_up_park/app/announcements/empty_content.dart';
+import 'package:get_up_park/app/daily_trivia/leaderboard/advisory_leaderboard_entry_model.dart';
+import 'package:get_up_park/app/daily_trivia/leaderboard/leaderboard_entry_model.dart';
+import 'package:get_up_park/app/daily_trivia/models/description_model.dart';
+import 'package:get_up_park/app/daily_trivia/models/question_model.dart';
 import 'package:get_up_park/app/home/events/event_model.dart';
 import 'package:get_up_park/app/home/groups/group_model.dart';
-import 'package:get_up_park/app/home/groups/post_modal.dart';
 import 'package:get_up_park/app/home/home/lunch_model.dart';
+import 'package:get_up_park/app/home/house_cup/team_model.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
 import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/home/sports/opponent_model.dart';
+import 'package:get_up_park/app/sign_in/select_advisor/advisor_model.dart';
 import 'package:get_up_park/app/user_model.dart';
+import 'package:get_up_park/cover_screen/cover_screen_model.dart';
 import 'package:get_up_park/services/firestore_path.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
@@ -64,7 +66,6 @@ class FirestoreDatabase {
     return returnURL;
   }
 
-
   Future<void> setAnnouncement(Announcement announcement) => _database.collection('announcements').doc(announcement.id).set(announcement.toMap());
 
   Future<void> setArticle(Article article) => _database.collection('articles').doc(article.id).set(article.toMap());
@@ -98,12 +99,20 @@ class FirestoreDatabase {
         'groupsFollowing': FieldValue.arrayRemove([groupName]),
       });
 
+  Future<void> addGroupUserCanAccess(String userID, String groupName) => _database.collection('users').doc(userID).update(
+      {
+        'groupsUserCanAccess': FieldValue.arrayUnion([groupName]),
+      });
+
+  Future<void> removeGroupUserCanAccess(String userID, String groupName) => _database.collection('users').doc(userID).update(
+      {
+        'groupsUserCanAccess': FieldValue.arrayRemove([groupName]),
+      });
+
   Future<void> setAdmin(String userID, String admin) => _database.collection('users').doc(userID).update(
       {
         'admin': admin,
       });
-
-  Future<void> setPost(Post post) => _database.collection('posts').doc(post.id).set(post.toMap());
 
   Future<void> setGame(Game game) => _database.collection('games').doc(game.id).set(game.toMap());
 
@@ -124,6 +133,56 @@ class FirestoreDatabase {
         'opponentName': opponent,
         'opponentLogoURL': opponentLogoURL,
       });
+
+  Future<void> setLive(String gameID, String liveStreamActive) => _database.collection('games').doc(gameID).update(
+      {
+        'liveStreamActive': liveStreamActive,
+      });
+
+  Future<void> addLiveUser(String gameID) => _database.collection('games').doc(gameID).update(
+      {
+        'numberOfLiveUsers': FieldValue.increment(1),
+      });
+
+  Future<void> removeLiveUser(String gameID) => _database.collection('games').doc(gameID).update(
+      {
+        'numberOfLiveUsers': FieldValue.increment(-1),
+      });
+
+  Future<void> resetLiveUserCount(String gameID) => _database.collection('games').doc(gameID).update(
+      {
+        'numberOfLiveUsers': 0,
+      });
+
+  Future<void> setAppLive() => _database.collection('app overrides').doc('cover screen').update(
+      {
+        'live': false,
+      });
+
+  Future<void> setTriviaQuestion(Question question) => _database.collection('questions').doc(question.id).set(question.toMap());
+
+  Future<void> deleteTriviaQuestion(Question question) => _database.collection('questions').doc(question.id).delete();
+
+  Future<void> addTriviaDay(String userID) => _database.collection('users').doc(userID).update(
+      {
+        'datesTriviaCompleted': FieldValue.arrayUnion([DateTime.now().toString()]),
+      });
+
+  Future<void> updateLeaderboardEntry(PTUser user, int score) => _database.collection('leaderboard').doc(user.id).set(
+      {
+        'score': FieldValue.increment(score),
+        'firstName': user.firstName,
+        'lastName': user.lastName,
+        'advisor': user.advisor,
+      },
+      SetOptions(merge: true));
+
+  Future<void> updateAdvisoryLeaderboardEntry(String advisor, int score) => _database.collection('advisory leaderboard').doc(advisor).set(
+      {
+        'score': FieldValue.increment(score),
+        'advisor': advisor,
+      },
+      SetOptions(merge: true));
 
   //
   // Future<void> deleteJob(Job job) async {
@@ -155,6 +214,13 @@ class FirestoreDatabase {
     builder: (data, documentId) => Article.fromMap(data, documentId),
   );
 
+  Stream<Group> groupStream(Group group) {
+    return _service.documentStream(
+      path: 'groups/${group.id}',
+      builder: (data, documentId) => Group.fromMap(data, documentId),
+    );
+  }
+
   Stream<PTUser> userStream() {
     return _service.documentStream(
       path: 'users/$uid',
@@ -162,9 +228,23 @@ class FirestoreDatabase {
     );
   }
 
+  Stream<Description> descriptionStream() {
+    return _service.documentStream(
+      path: 'trivia/description',
+      builder: (data, documentId) => Description.fromMap(data!, documentId),
+    );
+  }
+
+  Stream<CoverScreen> coverScreenStream() {
+    return _service.documentStream(
+      path: 'app overrides/cover screen',
+      builder: (data, documentId) => CoverScreen.fromMap(data, documentId),
+    );
+  }
+
   Stream<List<PTUser>> usersStream() => _service.collectionStream(
     path: 'users',
-    sort: (a, b) => b.firstName.compareTo(a.firstName),
+    sort: (a, b) => a.firstName.compareTo(b.firstName),
     builder: (data, documentId) => PTUser.fromMap(data, documentId),
   );
 
@@ -174,21 +254,20 @@ class FirestoreDatabase {
     builder: (data, documentId) => Group.fromMap(data, documentId),
   );
 
+  Stream<List<Event>> followedEventsStream(List<dynamic> groupsFollowing) {
+    return _database.collection('events').snapshots().map((event) =>
+        event.docs.map((e) => Event.fromMap(e.data(), e.id)).where((element) => groupsFollowing.contains(element.group)).toList());
+  }
+
   Stream<List<Event>> eventsStream() => _service.collectionStream(
     path: 'events',
     sort: (a, b) => a.date.compareTo(b.date),
     builder: (data, documentId) => Event.fromMap(data, documentId),
   );
 
-  Stream<List<Post>> postsStream() => _service.collectionStream(
-    path: 'posts',
-    sort: (a, b) => b.date.compareTo(a.date),
-    builder: (data, documentId) => Post.fromMap(data, documentId),
-  );
-
   Stream<List<Game>> gamesStream() => _service.collectionStream(
     path: 'games',
-    sort: (a, b) => b.date.compareTo(a.date),
+    sort: (a, b) => a.date.compareTo(b.date),
     builder: (data, documentId) => Game.fromMap(data, documentId),
   );
 
@@ -200,9 +279,40 @@ class FirestoreDatabase {
 
   Stream<List<Lunch>> lunchStream() => _service.collectionStream(
     path: 'lunch',
-    sort: (a, b) => a.date.compareTo(b.date),
+    sort: (a, b) => a.id.compareTo(b.id),
     builder: (data, documentId) => Lunch.fromMap(data, documentId),
   );
+
+  Stream<List<Question>> questionsStream() => _service.collectionStream(
+    path: 'questions',
+    sort: (a, b) => a.question.compareTo(b.question),
+    builder: (data, documentId) => Question.fromMap(data!, documentId),
+  );
+
+  Stream<List<LeaderboardEntry>> leaderboardStream() => _service.collectionStream(
+    path: 'leaderboard',
+    sort: (a, b) => b.score.compareTo(a.score),
+    builder: (data, documentId) => LeaderboardEntry.fromMap(data, documentId),
+  );
+
+  Stream<List<AdvisoryLeaderboardEntry>> advisoryLeaderboardStream() => _service.collectionStream(
+    path: 'advisory leaderboard',
+    sort: (a, b) => b.score.compareTo(a.score),
+    builder: (data, documentId) => AdvisoryLeaderboardEntry.fromMap(data, documentId),
+  );
+
+  Stream<List<Advisor>> advisorStream() => _service.collectionStream(
+    path: 'advisors',
+    sort: (a, b) => a.name.compareTo(b.name),
+    builder: (data, documentId) => Advisor.fromMap(data, documentId),
+  );
+
+  Stream<List<Team>> houseCupTeamsStream() => _service.collectionStream(
+    path: 'house cup teams',
+    sort: (a, b) => b.score.compareTo(a.score),
+    builder: (data, documentId) => Team.fromMap(data, documentId),
+  );
+
   //
   // Future<void> setEntry(Entry entry) => _service.setData(
   //   path: FirestorePath.entry(uid, entry.id),

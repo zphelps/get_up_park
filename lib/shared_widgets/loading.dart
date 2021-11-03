@@ -284,6 +284,7 @@ class LoadingNewsScroll extends StatelessWidget {
               baseColor: Colors.grey.withOpacity(0.125),
               highlightColor: Colors.white,
               enabled: true,
+              loop: 10,
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
@@ -395,6 +396,8 @@ class LoadingGroupsScroll extends StatelessWidget {
               baseColor: Colors.grey.withOpacity(0.125),
               highlightColor: Colors.white,
               enabled: true,
+              loop: 10,
+              period: const Duration(milliseconds: 650),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),

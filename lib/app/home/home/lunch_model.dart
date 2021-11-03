@@ -4,13 +4,17 @@ import 'package:get_up_park/app/home/groups/group_model.dart';
 
 @immutable
 class Lunch extends Equatable {
-  const Lunch({required this.id, required this.items, required this.date});
+  const Lunch({required this.id, required this.items, required this.dates, required this.grillItems, required this.deliItems, required this.grabgoItems, required this.hemisphereItems});
   final String id;
-  final String date;
+  final List<dynamic> dates;
   final List<dynamic> items;
+  final List<dynamic> grillItems;
+  final List<dynamic> deliItems;
+  final List<dynamic> grabgoItems;
+  final List<dynamic> hemisphereItems;
 
   @override
-  List<Object> get props => [id, items, date];
+  List<Object> get props => [id, items, dates, grillItems, deliItems, grabgoItems, hemisphereItems];
 
   @override
   bool get stringify => true;
@@ -19,22 +23,24 @@ class Lunch extends Equatable {
     if (data == null) {
       throw StateError('missing data for lunch: $documentId');
     }
-    final items = data['items'] as List<dynamic>?;
-    if (items == null) {
-      throw StateError('missing items for lunch: $documentId');
-    }
+    final items = data['items'] ?? [];
+    final dates = data['dates'] ?? [];
+    final grillItems = data['grillItems'] ?? [];
+    final deliItems = data['deliItems']  ?? [];
+    final grabgoItems = data['grabgoItems'] ?? [];
+    final hemisphereItems = data['hemisphereItems'] ?? [];
 
-    final date = data['date'] as String?;
-    if (date == null) {
-      throw StateError('missing date for lunch: $documentId');
-    }
-    return Lunch(id: documentId, items: items, date: date);
+    return Lunch(id: documentId, items: items, dates: dates, grillItems: grillItems, deliItems: deliItems, grabgoItems: grabgoItems, hemisphereItems: hemisphereItems);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'items': items,
-      'date': date,
+      'dates': dates,
+      'grillItems': grillItems,
+      'deliItems': deliItems,
+      'grabgoItems': grabgoItems,
+      'hemisphereItems': hemisphereItems,
     };
   }
 }

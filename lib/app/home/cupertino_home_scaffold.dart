@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/tab_item.dart';
 import 'package:get_up_park/constants/keys.dart';
 import 'package:get_up_park/routing/cupertino_tab_view_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 @immutable
 class CupertinoHomeScaffold extends StatelessWidget {
@@ -31,7 +32,7 @@ class CupertinoHomeScaffold extends StatelessWidget {
           _buildItem(TabItem.news),
           _buildItem(TabItem.events),
           _buildItem(TabItem.groups),
-          // _buildItem(TabItem.sports),
+          // _buildItem(TabItem.houseCup),
         ],
         onTap: (index) => onSelectTab(TabItem.values[index]),
       ),
@@ -48,7 +49,7 @@ class CupertinoHomeScaffold extends StatelessWidget {
 
   BottomNavigationBarItem _buildItem(TabItem tabItem) {
     final itemData = TabItemData.allTabs[tabItem]!;
-    final color = currentTab == tabItem ? Colors.red : Colors.grey[500];
+    final color = currentTab == tabItem ? Colors.red : Colors.grey[600];
     return BottomNavigationBarItem(
       backgroundColor: Colors.white,
       icon: Icon(
@@ -58,7 +59,7 @@ class CupertinoHomeScaffold extends StatelessWidget {
       title: Text(
         itemData.title,
         key: Key(itemData.key),
-        style: TextStyle(color: color),
+        style: GoogleFonts.inter(color: color),
       ),
     );
   }

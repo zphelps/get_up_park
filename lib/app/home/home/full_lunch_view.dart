@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/home/lunch_list_widget.dart';
+import 'package:intl/intl.dart';
 
 class FullLunchView extends StatelessWidget {
   const FullLunchView({Key? key}) : super(key: key);
@@ -7,11 +8,12 @@ class FullLunchView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         brightness: Brightness.light,
-        title: const Text(
-          "Today's Lunch Menu",
-          style: TextStyle(
+        title: Text(
+          "${DateFormat.EEEE().format(DateTime.now())}'s Lunch Menu",
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             fontWeight: FontWeight.w700,

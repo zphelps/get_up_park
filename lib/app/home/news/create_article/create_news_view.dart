@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:alert_dialogs/alert_dialogs.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_up_park/app/home/news/article_model.dart';
-import 'package:get_up_park/app/home/sports/game_model.dart';
 import 'package:get_up_park/app/top_level_providers.dart';
 import 'package:get_up_park/routing/app_router.dart';
 import 'package:get_up_park/services/firestore_database.dart';
@@ -23,7 +21,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
 
   @override
   void initState() {
-    // TODO: implement initState
+
     super.initState();
   }
 
@@ -62,7 +60,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
   String? _opponentName;
   String? _opponentScore;
   String? _opponentLogoURL;
-  bool _isDone = false;
+  bool _sendNotification = false;
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
@@ -103,10 +101,10 @@ class _CreateNewsViewState extends State<CreateNewsView> {
         if(_image!=null) {
           _imageURL = await database.uploadFile(_image!, _group ?? 'misc');
         }
-
+        final id = '${_group}: ${DateTime.now().toString()}';
         if((_gameID ?? '').length > 0) {
           final article = Article(
-              id: documentIdFromCurrentDate(),
+              id: id,
               title: _title ?? '',
               body: _body!,
               imageURL: _imageURL ?? '',
@@ -118,11 +116,13 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               gameDone: 'true'
           );
           await database.setArticle(article);
-          sendNotification(article, opponent: _opponentName!, opponentLogoURL: _opponentLogoURL!);
+          if(_sendNotification) {
+            sendNotification(article, opponent: _opponentName!, opponentLogoURL: _opponentLogoURL!);
+          }
         }
         else {
           final article = Article(
-              id: documentIdFromCurrentDate(),
+              id: id,
               title: _title ?? '',
               body: _body!,
               imageURL: _imageURL ?? '',
@@ -134,16 +134,20 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               gameDone: ''
           );
           await database.setArticle(article);
-          await sendNotification(article);
+          if(_sendNotification) {
+            await sendNotification(article);
+          }
         }
         if((_homeScore ?? '').length > 0 && (_opponentScore ?? '').length > 0) {
           await database.updateGameScore(_gameID!, _opponentScore!, _homeScore!, 'true');
         }
-        // await sendNewsNotifications(article);
 
         //await Future.delayed(const Duration(seconds: 1));
         Navigator.of(context).pop();
       } catch (e) {
+        setState(() {
+          _loading = false;
+        });
         showExceptionAlertDialog(
           context: context,
           title: 'Operation failed',
@@ -243,6 +247,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               const SizedBox(height: 10),
               // const Divider(height: 0, thickness: 0.5, color: Colors.grey),
               TextFormField(
+                textCapitalization: TextCapitalization.sentences,
                 autofocus: true,
                 autocorrect: true,
                 textInputAction: TextInputAction.done,
@@ -298,6 +303,7 @@ class _CreateNewsViewState extends State<CreateNewsView> {
                   return Column(
                     children: [
                       TextFormField(
+                        textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.done,
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
@@ -622,8 +628,8 @@ class _CreateNewsViewState extends State<CreateNewsView> {
               () {
                 if(_image == null) {
                   return ListTile(
-                    onTap: () {
-                      getImageFromPicker();
+                    onTap: () async {
+                      await getImageFromPicker();
                     },
                     visualDensity: const VisualDensity(vertical: -4),
                     contentPadding: const  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -690,6 +696,36 @@ class _CreateNewsViewState extends State<CreateNewsView> {
                 thickness: 0.5,
                 color: Colors.grey,
               ),
+              ListTile(
+                onTap: () {
+                  setState(() {
+                    _sendNotification = !_sendNotification;
+                  });
+                },
+                visualDensity: const VisualDensity(vertical: -4),
+                contentPadding: const  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.grey[300],
+                  child: const Icon(Icons.notifications_outlined, color: Colors.black),
+                ),
+                title: const Text(
+                  'Send Notification?',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  ),
+                ),
+                trailing: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    _sendNotification ? Icons.check_circle : Icons.check_circle_outline,
+                    color: _sendNotification ? Colors.red : Colors.grey,
+                  ),
+                ),
+              ),
+              const Divider(height: 0, color: Colors.grey, thickness: 0.5),
               const SizedBox(height: 100),
             ],
           ),
