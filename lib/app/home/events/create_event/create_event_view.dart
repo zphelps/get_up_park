@@ -565,7 +565,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             context: context,
                             firstDate: DateTime(2021),
                             initialDate: currentValue ?? DateTime.now(),
-                            lastDate: DateTime(2022));
+                            lastDate: DateTime(2030));
                         if (date != null) {
                           final time = await showTimePicker(
                             context: context,
